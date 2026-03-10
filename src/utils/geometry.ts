@@ -1,4 +1,4 @@
-import { LANE_WIDTH, SNAP_EXTRA, HANDLE_OFFSET, BUS_STOP_LENGTH_T } from "../constants";
+import { LANE_WIDTH, SNAP_EXTRA, HANDLE_OFFSET } from "../constants";
 import type {
   Vec2,
   ScreenNode,

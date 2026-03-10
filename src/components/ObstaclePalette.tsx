@@ -236,7 +236,17 @@ export function ObstaclePalette({
               Parking
             </span>
           </div>
-          {COEFF_TYPES.map((type) => {
+          {COEFF_TYPES.filter(
+            (type) =>
+              ![
+                "turning_radius",
+                "maneuver",
+                "lane_width",
+                "pedestrian_crossing",
+                "parking",
+                "bus_stop",
+              ].includes(type)
+          ).map((type) => {
             const cfg = COEFF[type];
             const active = draggingCoeff === type;
             return (

@@ -55,7 +55,7 @@ export function Toolbar({
     border: "1px solid",
     borderColor: tool === id ? "#4a80c0" : "#1e1e3e",
     background: tool === id ? "#1a304a" : "#1a1a2e",
-    color: tool === id ? "#80c0ff" : "#557",
+    color: tool === id ? "#80c0ff" : "#fff",
     cursor: "pointer",
     fontSize: 13,
     fontWeight: tool === id ? 700 : 400,
@@ -105,50 +105,10 @@ export function Toolbar({
         >
           ✂ Delete
         </button>
-        <button
-          style={toolBtn("crossing")}
-          onClick={() => {
-            setTool("crossing");
-            setBuildFrom(null);
-          }}
-          title="Pedestrian crossing (X)"
-        >
-          ⇔ Crossing
-        </button>
-        <button
-          style={toolBtn("bus_stop")}
-          onClick={() => {
-            setTool("bus_stop");
-            setBuildFrom(null);
-          }}
-          title="Bus stop (B)"
-        >
-          ◼ Bus Stop
-        </button>
-        <button
-          style={toolBtn("parking")}
-          onClick={() => {
-            setTool("parking");
-            setBuildFrom(null);
-          }}
-          title="Parking (P)"
-        >
-          ◻ Parking
-        </button>
-        <button
-          style={toolBtn("split")}
-          onClick={() => {
-            setTool("split");
-            setBuildFrom(null);
-          }}
-          title="Add node to road (A)"
-        >
-          ⊕ Add node
-        </button>
       </div>
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
 
-      <span style={{ color: "#445", fontSize: 11, whiteSpace: "nowrap" }}>
+      <span style={{ color: "#fff", fontSize: 11, whiteSpace: "nowrap" }}>
         New road:
       </span>
       <button
@@ -157,7 +117,7 @@ export function Toolbar({
       >
         {defOneWay ? "→ One-way" : "↔ Two-way"}
       </button>
-      <span style={{ color: "#334", fontSize: 11 }}>→</span>
+      <span style={{ color: "#fff", fontSize: 11 }}>→</span>
       {[1, 2, 3, 4].map((n) => (
         <button
           key={n}
@@ -173,7 +133,7 @@ export function Toolbar({
       ))}
       {!defOneWay && (
         <>
-          <span style={{ color: "#334", fontSize: 11 }}>←</span>
+          <span style={{ color: "#fff", fontSize: 11 }}>←</span>
           {[1, 2, 3, 4].map((n) => (
             <button
               key={n}
@@ -191,7 +151,7 @@ export function Toolbar({
       )}
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#445", fontSize: 11 }}>Speed:</span>
+      <span style={{ color: "#fff", fontSize: 11 }}>Speed:</span>
       {[30, 50, 70, 90, 110].map((s) => (
         <button
           key={s}
@@ -203,7 +163,7 @@ export function Toolbar({
       ))}
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#445", fontSize: 11 }}>Surface:</span>
+      <span style={{ color: "#fff", fontSize: 11 }}>Surface:</span>
       {SURFACE_KEYS.map((k) => (
         <button
           key={k}
@@ -227,7 +187,7 @@ export function Toolbar({
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ color: "#445", fontSize: 11 }}>Road size:</span>
+        <span style={{ color: "#fff", fontSize: 11 }}>Road size:</span>
         <input
           type="range"
           min={0.05}
@@ -238,12 +198,12 @@ export function Toolbar({
           style={{ width: 80, accentColor: "#4a80c0" }}
           title={`Display scale: ${roadScale.toFixed(2)}x`}
         />
-        <span style={{ color: "#778", fontSize: 11, minWidth: 32 }}>
+        <span style={{ color: "#fff", fontSize: 11, minWidth: 32 }}>
           {roadScale.toFixed(2)}×
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: "#445", fontSize: 11 }}>New:</span>
+        <span style={{ color: "#fff", fontSize: 11 }}>New:</span>
         <input
           type="range"
           min={0.05}
@@ -254,7 +214,7 @@ export function Toolbar({
           style={{ width: 60, accentColor: "#4a80c0" }}
           title={`Default size for new segments: ${defDisplayScale.toFixed(2)}×`}
         />
-        <span style={{ color: "#556", fontSize: 10 }}>
+        <span style={{ color: "#fff", fontSize: 10 }}>
           {defDisplayScale.toFixed(2)}×
         </span>
       </div>
@@ -280,7 +240,7 @@ export function Toolbar({
           marginLeft: "auto",
           display: "flex",
           gap: 12,
-          color: "#334",
+          color: "#fff",
           fontSize: 11,
           alignItems: "center",
         }}

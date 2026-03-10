@@ -102,8 +102,8 @@ export function useDragAndDrop({
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
       const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      const { segments: segs, nodes: ns, roadScale: rs } = stateRef.current;
-      const scale = getScale(map.getZoom(), rs);
+      const { segments: segs, nodes: ns } = stateRef.current;
+      // const scale = getScale(map.getZoom(), rs);
       const screenNodes = ns.map((n) => toScreen(map, n));
       const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
       const seg = segs.find((s) => s.id === dc.segId);
@@ -206,8 +206,8 @@ export function useDragAndDrop({
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
       const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      const { segments: segs, nodes: ns, roadScale: rs } = stateRef.current;
-      const scale = getScale(map.getZoom(), rs);
+      const { segments: segs, nodes: ns } = stateRef.current;
+      // const scale = getScale(map.getZoom(), rs);
       const screenNodes = ns.map((n) => toScreen(map, n));
       const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
       const seg = segs.find((s) => s.id === db.segId);
@@ -306,8 +306,8 @@ export function useDragAndDrop({
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
       const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-      const { segments: segs, nodes: ns, roadScale: rs } = stateRef.current;
-      const scale = getScale(map.getZoom(), rs);
+      const { segments: segs, nodes: ns } = stateRef.current;
+      // const scale = getScale(map.getZoom(), rs);
       const screenNodes = ns.map((n) => toScreen(map, n));
       const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
       const seg = segs.find((s) => s.id === dp.segId);

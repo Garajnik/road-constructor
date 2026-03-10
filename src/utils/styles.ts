@@ -7,7 +7,7 @@ export function chip(active: boolean): React.CSSProperties {
     border: "1px solid",
     borderColor: active ? "#4a80c0" : "#222240",
     background: active ? "#1a304a" : "#0d0d1a",
-    color: active ? "#80c0ff" : "#445",
+    color: active ? "#80c0ff" : "#fff",
     cursor: "pointer",
     fontSize: 12,
     fontWeight: active ? 700 : 400,

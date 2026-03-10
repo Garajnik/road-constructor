@@ -6,7 +6,7 @@ export function Legend() {
         bottom: 12,
         left: 12,
         zIndex: 10,
-        color: "#556",
+        color: "#fff",
         fontSize: 11,
         lineHeight: 1.9,
         userSelect: "none",
@@ -15,7 +15,7 @@ export function Legend() {
         padding: "4px 10px",
       }}
     >
-      <div>R = Road · S = Select · D = Delete · X = Crossing · B = Bus Stop · P = Parking · A = Add node · Esc = Cancel</div>
+      <div>R = Road · S = Select · D = Delete · Esc = Cancel</div>
       <div>Ctrl+Z = Undo · Ctrl+Y = Redo</div>
       <div>Scroll = Zoom · +/- = Zoom in/out · Shift+drag / Middle-drag = Pan</div>
       <div>

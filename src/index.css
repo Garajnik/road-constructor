@@ -24,10 +24,9 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow: hidden;
 }
 
 h1 {
@@ -65,4 +64,8 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+.leaflet-container {
+  background: #16213e;
 }

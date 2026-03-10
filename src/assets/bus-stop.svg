@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Road pocket outline -->
+  <path d="M8 48 L8 16 Q8 8 16 8 L48 8 Q56 8 56 16 L56 48" stroke="#40a060" stroke-width="3" fill="#40a06020"/>
+  <!-- Bus body -->
+  <rect x="14" y="18" width="36" height="22" rx="4" fill="#40a060"/>
+  <!-- Windows -->
+  <rect x="18" y="22" width="8" height="8" rx="1.5" fill="#fff" opacity="0.85"/>
+  <rect x="28" y="22" width="8" height="8" rx="1.5" fill="#fff" opacity="0.85"/>
+  <rect x="38" y="22" width="8" height="8" rx="1.5" fill="#fff" opacity="0.85"/>
+  <!-- Wheels -->
+  <circle cx="22" cy="42" r="3.5" fill="#222"/>
+  <circle cx="42" cy="42" r="3.5" fill="#222"/>
+  <!-- Door -->
+  <rect x="16" y="32" width="5" height="8" rx="1" fill="#2d7a45"/>
+  <!-- B label -->
+  <text x="32" y="56" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="10" fill="#40a060">BUS STOP</text>
+</svg>

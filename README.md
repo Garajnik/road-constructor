@@ -1,73 +1,85 @@
-# React + TypeScript + Vite
+# Road Constructor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Редактор дорожных сетей на интерактивной карте Leaflet. Позволяет рисовать перекрёстки, отрезки дорог, размещать пешеходные переходы, коэффициенты и другие объекты.
 
-Currently, two official plugins are available:
+## Технологии
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19 + TypeScript
+- Vite
+- Leaflet (карта)
+- Canvas 2D (отрисовка дорог)
 
-## React Compiler
+## Установка и запуск
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev    # dev-сервер с HMR
+npm run build  # сборка для продакшена
+npm run lint   # ESLint
+npm run preview # превью production-сборки
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Функционал
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Инструменты
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Инструмент | Горячая клавиша | Описание |
+|------------|-----------------|----------|
+| Дорога | `R` | Добавление узлов и сегментов дороги. При наведении на узел появляются хендлы (N/E/S/W) для продолжения цепочки |
+| Выбор | `S` | Клик для просмотра свойств сегмента |
+| Удаление | `D` | Клик для удаления узла или сегмента |
+| Переход | `X` | Размещение пешеходных переходов на сегменте |
+
+### Горячие клавиши
+
+- `R` — инструмент «Дорога»
+- `S` — инструмент «Выбор»
+- `D` — инструмент «Удаление»
+- `X` — инструмент «Пешеходный переход»
+- `Esc` — отмена текущего действия
+- `Delete` / `Backspace` — удалить выбранный объект
+
+### Дополнительно
+
+- Правая кнопка мыши — контекстная панель редактирования сегмента (`RoadEditPanel`)
+- Панель справа — перетаскиваемые коэффициенты и пешеходные переходы (`ObstaclePalette`)
+- Перетаскивание узлов и контрольных точек
+
+## Структура проекта
+
 ```
+src/
+├── types.ts           # Общие типы (Tool, RoadNode, RoadSegment и др.)
+├── constants.ts       # LANE_WIDTH, MAP_CENTER, COEFF, SURFACE и др.
+├── utils/
+│   ├── geometry.ts    # Расстояния, проекции, hit-тесты
+│   ├── coordinates.ts # Конвертация Leaflet ↔ экран, uid()
+│   └── styles.ts      # chip() и стили кнопок
+├── rendering/
+│   └── canvas.ts      # Отрисовка дорог, разметки, маркеров на Canvas
+├── state/
+│   └── reducer.ts     # appReducer, AppState, AppAction
+├── hooks/
+│   ├── useCanvasRenderer.ts  # Рендер при изменении state
+│   ├── useMap.ts             # Инициализация Leaflet, zoom
+│   ├── useKeyboardShortcuts.ts
+│   ├── useCanvasEvents.ts    # Обработка мыши по инструментам
+│   └── useDragAndDrop.ts     # Перетаскивание, pan, коэффициенты
+├── components/
+│   ├── Toolbar.tsx           # Панель инструментов
+│   ├── RoadEditPanel.tsx     # Панель редактирования сегмента
+│   ├── ObstaclePalette.tsx   # Палитра коэффициентов/переходов
+│   ├── SelectionInfoPanel.tsx
+│   ├── LaneCounter.tsx, SectionLabel.tsx
+│   └── Legend.tsx            # Подсказка по горячим клавишам
+└── App.tsx
+```
+
+## Модель данных
+
+- **RoadNode[]** — узлы (перекрёстки, концы дорог): `{ id, lat, lng }`
+- **RoadSegment[]** — сегменты дорог между узлами: полосы, ограничение скорости, тип покрытия, коэффициенты, пешеходные переходы
+
+## Лицензия
+
+Private project.

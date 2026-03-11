@@ -70,6 +70,13 @@ export function RoadEditPanel({
   const top = Math.min(panelY - 10, window.innerHeight - 510);
   const oneWay = seg.lanesBackward === 0;
 
+  const P = computeCapacity(seg);
+  const Z =
+    seg.trafficIntensity != null && seg.trafficIntensity >= 0
+      ? computeServiceLevel(seg.trafficIntensity, P)
+      : null;
+  const rating = Z != null ? getServiceLevelRating(Z) : null;
+
   return (
     <div
       style={{
@@ -110,20 +117,52 @@ export function RoadEditPanel({
         <span style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: 14 }}>
           Свойства дороги
         </span>
-        <button
-          onClick={onClose}
-          style={{
-            background: "none",
-            border: "none",
-            color: "var(--text-faint)",
-            cursor: "pointer",
-            fontSize: 20,
-            lineHeight: 1,
-            padding: 0,
-          }}
-        >
-          ✕
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {rating ? (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 22,
+                height: 22,
+                padding: "0 5px",
+                borderRadius: 4,
+                background: `${rating.color}33`,
+                color: rating.color,
+                fontSize: 12,
+                fontWeight: 800,
+              }}
+              title={`Z = ${Z?.toFixed(3) ?? ""}`}
+            >
+              {rating.letter}
+            </span>
+          ) : (
+            <span
+              style={{
+                color: "var(--text-faint)",
+                fontSize: 11,
+              }}
+              title="Задайте интенсивность трафика"
+            >
+              —
+            </span>
+          )}
+          <button
+            onClick={onClose}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--text-faint)",
+              cursor: "pointer",
+              fontSize: 20,
+              lineHeight: 1,
+              padding: 0,
+            }}
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       {segmentT != null && onAddNode && (

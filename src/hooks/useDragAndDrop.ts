@@ -10,7 +10,36 @@ import {
   projectToSegment,
   detectSide,
   roadWidth,
+  bezierPoint,
+  bezierTangent,
+  nearestTOnCurve,
 } from "../utils/geometry";
+import type { Vec2 } from "../types";
+
+/** Convert segment geo-space cps to screen-space. */
+function buildScreenCpMap(map: L.Map, segs: readonly { id: string; cp?: { lat: number; lng: number } }[]): Map<string, Vec2> {
+  const out = new Map<string, Vec2>();
+  for (const seg of segs) {
+    if (!seg.cp) continue;
+    const pt = map.latLngToContainerPoint([seg.cp.lat, seg.cp.lng]);
+    out.set(seg.id, { x: pt.x, y: pt.y });
+  }
+  return out;
+}
+
+/** Detect which side of a (possibly curved) segment a point is on. */
+function detectSideOnSeg(
+  pos: Vec2,
+  a: Vec2,
+  b: Vec2,
+  cp: Vec2 | undefined,
+): "left" | "right" {
+  if (!cp) return detectSide(pos, a, b);
+  const t = nearestTOnCurve(pos, a, cp, b);
+  const pt = bezierPoint(a, cp, b, t);
+  const tan = bezierTangent(a, cp, b, t);
+  return detectSide(pos, pt, { x: pt.x + tan.x, y: pt.y + tan.y });
+}
 import type { AppAction, AppState, HistorySnapshot } from "../state/reducer";
 
 type RefState = Pick<AppState, "nodes" | "segments" | "tool" | "roadScale">;
@@ -507,7 +536,8 @@ export function useDragAndDrop({
       const scale = getScale(map.getZoom(), rs);
       const screenNodes = ns.map((n) => toScreen(map, n));
       const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
-      const seg = nearestSegment(screenMap, segs, pos, 30, scale);
+      const cpMap = buildScreenCpMap(map, segs);
+      const seg = nearestSegment(screenMap, segs, pos, 30, scale, cpMap);
       dispatch({ type: "SET_DROP_TARGET_SEG_ID", id: seg?.id ?? null });
     },
     [canvasRef, mapRef, stateRef, dispatch, draggingCoeffRef, draggingCrossingFromPaletteRef, draggingBusStopFromPaletteRef, draggingParkingFromPaletteRef],
@@ -534,9 +564,10 @@ export function useDragAndDrop({
     const scale = getScale(map.getZoom(), rs);
     const screenNodes = ns.map((n) => toScreen(map, n));
     const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
+    const cpMap = buildScreenCpMap(map, segs);
 
     if (fromPalette) {
-      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale);
+      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale, cpMap);
       if (snap) {
         const safeT = Math.max(0.05, Math.min(0.95, snap.t));
         dispatch({ type: "SAVE_HISTORY" });
@@ -558,12 +589,13 @@ export function useDragAndDrop({
       dispatch({ type: "SET_DRAGGING_CROSSING_FROM_PALETTE", value: false });
       draggingCrossingFromPaletteRef.current = false;
     } else if (fromBusPalette) {
-      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale);
+      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale, cpMap);
       if (snap) {
         const safeT = Math.max(0.05, Math.min(0.95, snap.t));
         const a = screenMap.get(snap.seg.fromId);
         const b = screenMap.get(snap.seg.toId);
-        const side = a && b ? detectSide(pos, a, b) : "right" as const;
+        const cp = cpMap.get(snap.seg.id);
+        const side = a && b ? detectSideOnSeg(pos, a, b, cp) : "right" as const;
         dispatch({ type: "SAVE_HISTORY" });
         dispatch({
           type: "UPDATE_SEGMENTS",
@@ -583,12 +615,13 @@ export function useDragAndDrop({
       dispatch({ type: "SET_DRAGGING_BUS_STOP_FROM_PALETTE", value: false });
       draggingBusStopFromPaletteRef.current = false;
     } else if (fromParkingPalette) {
-      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale);
+      const snap = nearestSegmentWithT(screenMap, segs, pos, 30, scale, cpMap);
       if (snap) {
         const safeT = Math.max(0.05, Math.min(0.95, snap.t));
         const a = screenMap.get(snap.seg.fromId);
         const b = screenMap.get(snap.seg.toId);
-        const side = a && b ? detectSide(pos, a, b) : "right" as const;
+        const cp = cpMap.get(snap.seg.id);
+        const side = a && b ? detectSideOnSeg(pos, a, b, cp) : "right" as const;
         dispatch({ type: "SAVE_HISTORY" });
         dispatch({
           type: "UPDATE_SEGMENTS",
@@ -608,7 +641,7 @@ export function useDragAndDrop({
       dispatch({ type: "SET_DRAGGING_PARKING_FROM_PALETTE", value: false });
       draggingParkingFromPaletteRef.current = false;
     } else if (dc) {
-      const seg = nearestSegment(screenMap, segs, pos, 30, scale);
+      const seg = nearestSegment(screenMap, segs, pos, 30, scale, cpMap);
       if (seg) {
         const cfg = COEFF[dc];
         dispatch({ type: "SAVE_HISTORY" });

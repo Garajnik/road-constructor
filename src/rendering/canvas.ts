@@ -149,7 +149,6 @@ export function render(opts: RenderOptions) {
   const light = theme === "light";
   const textColor = light ? "#1a1a2e" : "rgba(255,255,255,0.9)";
   const textMuted = light ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.22)";
-  const crossingStripe = light ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.95)";
   const nodeHoverStroke = light ? "#64748b" : "#aaa";
   const segHoverBorder = light ? "#94a3b8" : "#2a2a40";
 
@@ -432,7 +431,7 @@ export function render(opts: RenderOptions) {
       for (let i = 0; i < NUM_STRIPES; i++) {
         const totalSpan = stripePitch * (NUM_STRIPES - 1) + stripeWidth;
         const y0 = -totalSpan / 2 + i * stripePitch;
-        ctx.fillStyle = crossingStripe;
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
         ctx.fillRect(-cw / 2, y0, cw, stripeWidth);
       }
       ctx.restore();
@@ -801,12 +800,14 @@ export function render(opts: RenderOptions) {
       const hpX = cp ? cp.x : (a.x + b.x) / 2;
       const hpY = cp ? cp.y : (a.y + b.y) / 2;
 
-      // Dashed line from both endpoints to cp for curved segments
+      // Dashed control arms from endpoints to cp
       if (cp) {
         ctx.save();
-        ctx.setLineDash([4 * scale, 4 * scale]);
-        ctx.strokeStyle = "rgba(100,200,255,0.35)";
-        ctx.lineWidth = 1 * scale;
+        ctx.setLineDash([5 * scale, 4 * scale]);
+        ctx.strokeStyle = isHov || isDrag
+          ? "rgba(100,200,255,0.65)"
+          : "rgba(100,200,255,0.4)";
+        ctx.lineWidth = (isHov || isDrag ? 1.5 : 1) * scale;
         ctx.beginPath();
         ctx.moveTo(a.x, a.y);
         ctx.lineTo(cp.x, cp.y);
@@ -817,28 +818,28 @@ export function render(opts: RenderOptions) {
       }
 
       // Draw CP handle as diamond
-      const hSize = (isHov || isDrag ? 8 : 6) * scale;
+      const hSize = (isHov || isDrag ? 18 : 14) * scale;
       ctx.save();
       ctx.translate(hpX, hpY);
       ctx.rotate(Math.PI / 4);
       ctx.beginPath();
       ctx.rect(-hSize / 2, -hSize / 2, hSize, hSize);
       ctx.fillStyle = isDrag
-        ? "rgba(255,180,60,0.9)"
+        ? "rgba(255,165,40,0.95)"
         : isHov
-          ? (light ? "#93c5fd" : "#1e4a9a")
+          ? (light ? "#60a5fa" : "#3b82f6")
           : cp
-            ? (light ? "#fbbf24" : "#d97706")
-            : (light ? "#e2e8f0" : "#1e293b");
+            ? (light ? "#fbbf24" : "#f59e0b")
+            : (light ? "#cbd5e1" : "#334155");
       ctx.fill();
       ctx.strokeStyle = isDrag
-        ? "#ff8c00"
+        ? "#ea8000"
         : isHov
-          ? (light ? "#2563eb" : "#80c0ff")
+          ? (light ? "#1d4ed8" : "#93c5fd")
           : cp
-            ? (light ? "#b45309" : "#f59e0b")
-            : (light ? "#60a5fa" : "#3a60a0");
-      ctx.lineWidth = (isHov || isDrag ? 2 : 1.5) * scale;
+            ? (light ? "#92400e" : "#fde68a")
+            : (light ? "#475569" : "#64748b");
+      ctx.lineWidth = (isHov || isDrag ? 2.5 : 2) * scale;
       ctx.stroke();
       ctx.restore();
     }

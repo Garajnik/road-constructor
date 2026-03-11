@@ -3,6 +3,8 @@ import { SURFACE, SURFACE_KEYS } from "../constants";
 import { chip } from "../utils/styles";
 
 interface ToolbarProps {
+  theme: "dark" | "light";
+  setTheme: (t: "dark" | "light") => void;
   tool: Tool;
   setTool: (t: Tool) => void;
   defLanesF: number;
@@ -26,6 +28,8 @@ interface ToolbarProps {
 }
 
 export function Toolbar({
+  theme,
+  setTheme,
   tool,
   setTool,
   defLanesF,
@@ -53,9 +57,9 @@ export function Toolbar({
     padding: "4px 13px",
     borderRadius: 5,
     border: "1px solid",
-    borderColor: tool === id ? "#4a80c0" : "#1e1e3e",
-    background: tool === id ? "#1a304a" : "#1a1a2e",
-    color: tool === id ? "#80c0ff" : "#fff",
+    borderColor: tool === id ? "var(--accent-muted)" : "var(--border)",
+    background: tool === id ? "var(--chip-active-bg)" : "var(--chip-inactive-bg)",
+    color: tool === id ? "var(--accent)" : "var(--text-primary)",
     cursor: "pointer",
     fontSize: 13,
     fontWeight: tool === id ? 700 : 400,
@@ -68,12 +72,28 @@ export function Toolbar({
         alignItems: "center",
         gap: 8,
         padding: "6px 14px",
-        background: "#12122a",
-        borderBottom: "1px solid #1e1e3e",
+        background: "var(--toolbar-bg)",
+        borderBottom: "1px solid var(--border)",
         flexShrink: 0,
         flexWrap: "wrap",
       }}
     >
+      <button
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        style={{
+          padding: "4px 10px",
+          borderRadius: 5,
+          border: "1px solid var(--border)",
+          background: "var(--chip-inactive-bg)",
+          color: "var(--text-primary)",
+          cursor: "pointer",
+          fontSize: 13,
+        }}
+        title={theme === "dark" ? "Светлая тема" : "Тёмная тема"}
+      >
+        {theme === "dark" ? "☀" : "☾"}
+      </button>
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
       <div style={{ display: "flex", gap: 4 }}>
         <button
           style={toolBtn("road")}
@@ -106,9 +126,9 @@ export function Toolbar({
           ✂ Удалить
         </button>
       </div>
-      <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
 
-      <span style={{ color: "#fff", fontSize: 11, whiteSpace: "nowrap" }}>
+      <span style={{ color: "var(--text-primary)", fontSize: 11, whiteSpace: "nowrap" }}>
         Новая дорога:
       </span>
       <button
@@ -117,7 +137,7 @@ export function Toolbar({
       >
         {defOneWay ? "→ Односторонняя" : "↔ Двусторонняя"}
       </button>
-      <span style={{ color: "#fff", fontSize: 11 }}>→</span>
+      <span style={{ color: "var(--text-primary)", fontSize: 11 }}>→</span>
       {[1, 2, 3, 4].map((n) => (
         <button
           key={n}
@@ -133,7 +153,7 @@ export function Toolbar({
       ))}
       {!defOneWay && (
         <>
-          <span style={{ color: "#fff", fontSize: 11 }}>←</span>
+          <span style={{ color: "var(--text-primary)", fontSize: 11 }}>←</span>
           {[1, 2, 3, 4].map((n) => (
             <button
               key={n}
@@ -150,8 +170,8 @@ export function Toolbar({
         </>
       )}
 
-      <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#fff", fontSize: 11 }}>Скорость:</span>
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
+      <span style={{ color: "var(--text-primary)", fontSize: 11 }}>Скорость:</span>
       {[30, 50, 70, 90, 110].map((s) => (
         <button
           key={s}
@@ -162,8 +182,8 @@ export function Toolbar({
         </button>
       ))}
 
-      <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#fff", fontSize: 11 }}>Покрытие:</span>
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
+      <span style={{ color: "var(--text-primary)", fontSize: 11 }}>Покрытие:</span>
       {SURFACE_KEYS.map((k) => (
         <button
           key={k}
@@ -185,9 +205,9 @@ export function Toolbar({
         </button>
       ))}
 
-      <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ color: "#fff", fontSize: 11 }}>Размер дорог:</span>
+        <span style={{ color: "var(--text-primary)", fontSize: 11 }}>Размер дорог:</span>
         <input
           type="range"
           min={0.05}
@@ -195,15 +215,15 @@ export function Toolbar({
           step={0.01}
           value={roadScale}
           onChange={(e) => setRoadScale(parseFloat(e.target.value))}
-          style={{ width: 80, accentColor: "#4a80c0" }}
+          style={{ width: 80, accentColor: "var(--accent-muted)" }}
           title={`Масштаб отображения: ${roadScale.toFixed(2)}x`}
         />
-        <span style={{ color: "#fff", fontSize: 11, minWidth: 32 }}>
+        <span style={{ color: "var(--text-primary)", fontSize: 11, minWidth: 32 }}>
           {roadScale.toFixed(2)}×
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: "#fff", fontSize: 11 }}>Новая:</span>
+        <span style={{ color: "var(--text-primary)", fontSize: 11 }}>Новая:</span>
         <input
           type="range"
           min={0.05}
@@ -211,23 +231,23 @@ export function Toolbar({
           step={0.05}
           value={defDisplayScale}
           onChange={(e) => setDefDisplayScale(parseFloat(e.target.value))}
-          style={{ width: 60, accentColor: "#4a80c0" }}
+          style={{ width: 60, accentColor: "var(--accent-muted)" }}
           title={`Размер для новых участков: ${defDisplayScale.toFixed(2)}×`}
         />
-        <span style={{ color: "#fff", fontSize: 10 }}>
+        <span style={{ color: "var(--text-primary)", fontSize: 10 }}>
           {defDisplayScale.toFixed(2)}×
         </span>
       </div>
 
-      <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
+      <div style={{ width: 1, height: 24, background: "var(--border)" }} />
       <button
         onClick={onClear}
         style={{
           padding: "4px 12px",
           borderRadius: 5,
-          border: "1px solid #3a1a1a",
-          background: "#1a0d0d",
-          color: "#a05050",
+          border: "1px solid var(--clear-btn-border)",
+          background: "var(--clear-btn-bg)",
+          color: "var(--clear-btn-color)",
           cursor: "pointer",
           fontSize: 13,
         }}
@@ -240,7 +260,7 @@ export function Toolbar({
           marginLeft: "auto",
           display: "flex",
           gap: 12,
-          color: "#fff",
+          color: "var(--text-primary)",
           fontSize: 11,
           alignItems: "center",
         }}

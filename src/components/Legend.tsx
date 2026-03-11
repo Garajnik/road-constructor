@@ -6,11 +6,11 @@ export function Legend() {
         bottom: 12,
         left: 12,
         zIndex: 10,
-        color: "#fff",
+        color: "var(--legend-text)",
         fontSize: 11,
         lineHeight: 1.9,
         userSelect: "none",
-        background: "rgba(13,13,26,0.7)",
+        background: "var(--legend-bg)",
         borderRadius: 6,
         padding: "4px 10px",
       }}

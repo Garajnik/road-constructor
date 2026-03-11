@@ -12,6 +12,7 @@ import {
   CROSSING_DEFAULT_WIDTH,
   CROSSING_MIN_WIDTH,
   CROSSING_MAX_WIDTH,
+  DEFAULT_TRAFFIC_INTENSITY,
 } from "../constants";
 import { uid } from "../utils/coordinates";
 import { chip } from "../utils/styles";
@@ -79,13 +80,13 @@ export function RoadEditPanel({
         width: PW,
         maxHeight: "calc(100vh - 40px)",
         overflowY: "auto" as const,
-        background: "#111128",
-        border: "1px solid #252550",
+        background: "var(--panel-bg)",
+        border: "1px solid var(--border)",
         borderRadius: 10,
         padding: "14px 16px",
-        color: "#bbc",
+        color: "var(--text-body)",
         fontSize: 13,
-        boxShadow: "0 8px 40px rgba(0,0,0,0.8)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
         userSelect: "none",
       }}
       onMouseDown={(e) => e.stopPropagation()}
@@ -101,12 +102,12 @@ export function RoadEditPanel({
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: 14,
-          borderBottom: "1px solid #1e1e40",
+          borderBottom: "1px solid var(--border-muted)",
           paddingBottom: 10,
           cursor: onPanelMove ? "grab" : undefined,
         }}
       >
-        <span style={{ fontWeight: 700, color: "#eef", fontSize: 14 }}>
+        <span style={{ fontWeight: 700, color: "var(--text-secondary)", fontSize: 14 }}>
           Свойства дороги
         </span>
         <button
@@ -114,7 +115,7 @@ export function RoadEditPanel({
           style={{
             background: "none",
             border: "none",
-            color: "#556",
+            color: "var(--text-faint)",
             cursor: "pointer",
             fontSize: 20,
             lineHeight: 1,
@@ -135,10 +136,10 @@ export function RoadEditPanel({
             style={{
               width: "100%",
               padding: "8px 12px",
-              background: "#1a304a",
-              border: "1px solid #2a5080",
+              background: "var(--chip-active-bg)",
+              border: "1px solid var(--accent-muted)",
               borderRadius: 6,
-              color: "#80c0ff",
+              color: "var(--accent)",
               cursor: "pointer",
               fontSize: 13,
               fontWeight: 600,
@@ -242,9 +243,9 @@ export function RoadEditPanel({
             onChange={(e) =>
               onChange({ ...seg, displayScale: parseFloat(e.target.value) })
             }
-            style={{ flex: 1, accentColor: "#4a80c0" }}
+            style={{ flex: 1, accentColor: "var(--accent-muted)" }}
           />
-          <span style={{ color: "#80c0ff", fontWeight: 700, minWidth: 36 }}>
+          <span style={{ color: "var(--accent)", fontWeight: 700, minWidth: 36 }}>
             {(seg.displayScale ?? 1).toFixed(2)}×
           </span>
         </div>
@@ -258,14 +259,14 @@ export function RoadEditPanel({
               style={{
                 marginBottom: 4,
                 padding: "4px 6px",
-                background: "#0a0a18",
+                background: "var(--chip-inactive-bg)",
                 borderRadius: 4,
-                border: "1px solid #1a1a30",
+                border: "1px solid var(--border-alt)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{ color: "#e0c030", fontSize: 12 }}>⇔</span>
-                <span style={{ color: "#99a", fontSize: 11 }}>
+                <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
                   {(c.t * 100).toFixed(0)}% вдоль дороги
                 </span>
                 <button
@@ -281,7 +282,7 @@ export function RoadEditPanel({
                     marginLeft: "auto",
                     background: "none",
                     border: "none",
-                    color: "#a05050",
+                    color: "var(--clear-btn-color)",
                     cursor: "pointer",
                     fontSize: 14,
                     padding: "0 4px",
@@ -299,7 +300,7 @@ export function RoadEditPanel({
                   marginTop: 4,
                 }}
               >
-                <span style={{ color: "#667", fontSize: 10 }}>Ширина:</span>
+                <span style={{ color: "var(--text-dim)", fontSize: 10 }}>Ширина:</span>
                 <input
                   type="range"
                   min={CROSSING_MIN_WIDTH}
@@ -335,10 +336,10 @@ export function RoadEditPanel({
             }
             style={{
               width: "100%",
-              background: "#0d0d1a",
-              border: "1px dashed #333350",
+              background: "var(--chip-inactive-bg)",
+              border: "1px dashed var(--border)",
               borderRadius: 4,
-              color: "#667",
+              color: "var(--text-dim)",
               padding: "6px 8px",
               fontSize: 11,
               cursor: "pointer",
@@ -350,7 +351,7 @@ export function RoadEditPanel({
           <div
             style={{
               marginTop: 10,
-              borderTop: "1px solid #1a1a30",
+              borderTop: "1px solid var(--border-alt)",
               paddingTop: 10,
             }}
           />
@@ -363,15 +364,15 @@ export function RoadEditPanel({
                 gap: 6,
                 marginBottom: 4,
                 padding: "4px 6px",
-                background: "#0a0a18",
+                background: "var(--chip-inactive-bg)",
                 borderRadius: 4,
-                border: "1px solid #1a1a30",
+                border: "1px solid var(--border-alt)",
               }}
             >
               <span style={{ color: "#40a060", fontSize: 12, fontWeight: 700 }}>
                 B
               </span>
-              <span style={{ color: "#99a", fontSize: 11 }}>
+              <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
                 {(bs.t * 100).toFixed(0)}%
               </span>
               <select
@@ -386,10 +387,10 @@ export function RoadEditPanel({
                   });
                 }}
                 style={{
-                  background: "#0d0d1a",
-                  border: "1px solid #222240",
+                  background: "var(--chip-inactive-bg)",
+                  border: "1px solid var(--border)",
                   borderRadius: 3,
-                  color: "#80c0ff",
+                  color: "var(--accent)",
                   padding: "1px 4px",
                   fontSize: 11,
                 }}
@@ -433,10 +434,10 @@ export function RoadEditPanel({
             }
             style={{
               width: "100%",
-              background: "#0d0d1a",
-              border: "1px dashed #333350",
+              background: "var(--chip-inactive-bg)",
+              border: "1px dashed var(--border)",
               borderRadius: 4,
-              color: "#667",
+              color: "var(--text-dim)",
               padding: "6px 8px",
               fontSize: 11,
               cursor: "pointer",
@@ -448,7 +449,7 @@ export function RoadEditPanel({
           <div
             style={{
               marginTop: 10,
-              borderTop: "1px solid #1a1a30",
+              borderTop: "1px solid var(--border-alt)",
               paddingTop: 10,
             }}
           />
@@ -458,9 +459,9 @@ export function RoadEditPanel({
               style={{
                 marginBottom: 4,
                 padding: "4px 6px",
-                background: "#0a0a18",
+                background: "var(--chip-inactive-bg)",
                 borderRadius: 4,
-                border: "1px solid #1a1a30",
+                border: "1px solid var(--border-alt)",
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -469,7 +470,7 @@ export function RoadEditPanel({
                 >
                   P
                 </span>
-                <span style={{ color: "#99a", fontSize: 11 }}>
+                <span style={{ color: "var(--text-muted)", fontSize: 11 }}>
                   {(ps.t * 100).toFixed(0)}%
                 </span>
                 <select
@@ -484,10 +485,10 @@ export function RoadEditPanel({
                     });
                   }}
                   style={{
-                    background: "#0d0d1a",
-                    border: "1px solid #222240",
+                    background: "var(--chip-inactive-bg)",
+                    border: "1px solid var(--border)",
                     borderRadius: 3,
-                    color: "#80c0ff",
+                    color: "var(--accent)",
                     padding: "1px 4px",
                     fontSize: 11,
                   }}
@@ -508,7 +509,7 @@ export function RoadEditPanel({
                     marginLeft: "auto",
                     background: "none",
                     border: "none",
-                    color: "#a05050",
+                    color: "var(--clear-btn-color)",
                     cursor: "pointer",
                     fontSize: 14,
                     padding: "0 4px",
@@ -526,7 +527,7 @@ export function RoadEditPanel({
                   marginTop: 4,
                 }}
               >
-                <span style={{ color: "#667", fontSize: 10 }}>Длина:</span>
+                <span style={{ color: "var(--text-dim)", fontSize: 10 }}>Длина:</span>
                 <input
                   type="range"
                   min={PARKING_MIN_LENGTH_T}
@@ -567,10 +568,10 @@ export function RoadEditPanel({
             }
             style={{
               width: "100%",
-              background: "#0d0d1a",
-              border: "1px dashed #333350",
+              background: "var(--chip-inactive-bg)",
+              border: "1px dashed var(--border)",
               borderRadius: 4,
-              color: "#667",
+              color: "var(--text-dim)",
               padding: "6px 8px",
               fontSize: 11,
               cursor: "pointer",
@@ -582,7 +583,7 @@ export function RoadEditPanel({
           <div
             style={{
               marginTop: 10,
-              borderTop: "1px solid #1a1a30",
+              borderTop: "1px solid var(--border-alt)",
               paddingTop: 10,
             }}
           />
@@ -598,9 +599,9 @@ export function RoadEditPanel({
                   gap: 6,
                   marginBottom: 5,
                   padding: "5px 7px",
-                  background: "#0a0a18",
+                  background: "var(--chip-inactive-bg)",
                   borderRadius: 5,
-                  border: "1px solid #1a1a30",
+                  border: "1px solid var(--border-alt)",
                 }}
               >
                 <span
@@ -614,7 +615,7 @@ export function RoadEditPanel({
                 />
                 <span
                   style={{
-                    color: "#99a",
+                    color: "var(--text-muted)",
                     fontSize: 12,
                     flex: 1,
                     whiteSpace: "nowrap",
@@ -648,7 +649,7 @@ export function RoadEditPanel({
                         background: "#0d0d1a",
                         border: "1px solid #222240",
                         borderRadius: 3,
-                        color: "#80c0ff",
+                        color: "var(--accent)",
                         padding: "2px 4px",
                         fontSize: 12,
                         textAlign: "right",
@@ -656,7 +657,7 @@ export function RoadEditPanel({
                     />
                     {cfg.unit && (
                       <span
-                        style={{ color: "#556", fontSize: 11, minWidth: 20 }}
+                        style={{ color: "var(--text-faint)", fontSize: 11, minWidth: 20 }}
                       >
                         {cfg.unit}
                       </span>
@@ -675,7 +676,7 @@ export function RoadEditPanel({
                   style={{
                     background: "none",
                     border: "none",
-                    color: "#a05050",
+                    color: "var(--clear-btn-color)",
                     cursor: "pointer",
                     fontSize: 16,
                     padding: "0 2px",
@@ -704,8 +705,8 @@ export function RoadEditPanel({
               }}
               style={{
                 width: "100%",
-                background: "#0d0d1a",
-                border: "1px solid #222240",
+                background: "var(--chip-inactive-bg)",
+                border: "1px solid var(--border)",
                 borderRadius: 4,
                 color: "#80c0ff",
                 padding: "5px 8px",
@@ -731,9 +732,9 @@ export function RoadEditPanel({
         <div
           style={{
             padding: "10px 12px",
-            background: "#0a0a18",
+            background: "var(--chip-inactive-bg)",
             borderRadius: 6,
-            border: "1px solid #1a1a30",
+            border: "1px solid var(--border-alt)",
           }}
         >
           <div style={{ marginBottom: 8 }}>
@@ -744,7 +745,7 @@ export function RoadEditPanel({
               type="number"
               min={0}
               step={50}
-              placeholder="0"
+              placeholder={String(DEFAULT_TRAFFIC_INTENSITY)}
               value={seg.trafficIntensity ?? ""}
               onChange={(e) => {
                 const v =
@@ -760,8 +761,8 @@ export function RoadEditPanel({
               style={{
                 width: "100%",
                 marginTop: 4,
-                background: "#0d0d1a",
-                border: "1px solid #222240",
+                background: "var(--chip-inactive-bg)",
+                border: "1px solid var(--border)",
                 borderRadius: 3,
                 color: "#80c0ff",
                 padding: "6px 8px",
@@ -769,10 +770,10 @@ export function RoadEditPanel({
               }}
             />
           </div>
-          <div style={{ color: "#99a", fontSize: 11, marginBottom: 2 }}>
+          <div style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 2 }}>
             Пропускная способность P = {computeCapacity(seg).toLocaleString()} авт/ч
           </div>
-          <div style={{ fontSize: 11, color: "#778", marginBottom: 6 }}>
+          <div style={{ fontSize: 11, color: "var(--text-dim)", marginBottom: 6 }}>
             (зависит от полос, скорости, покрытия, препятствий, переходов)
           </div>
           {seg.trafficIntensity != null &&
@@ -785,14 +786,14 @@ export function RoadEditPanel({
                 <div
                   style={{
                     paddingTop: 8,
-                    borderTop: "1px solid #1a1a30",
+                    borderTop: "1px solid var(--border-alt)",
                     fontWeight: 700,
                     display: "flex",
                     alignItems: "center",
                     gap: 8,
                   }}
                 >
-                  <span style={{ color: "#eef" }}>
+                  <span style={{ color: "var(--text-secondary)" }}>
                     Z = N/P = {Z?.toFixed(3) ?? "—"}
                   </span>
                   {rating && (

@@ -26,14 +26,14 @@ export function SelectionInfoPanel({
         top: 12,
         right: 12,
         zIndex: 10,
-        background: "#111128",
-        border: "1px solid #1e1e3e",
+        background: "var(--panel-bg)",
+        border: "1px solid var(--border)",
         borderRadius: 8,
         padding: "12px 16px",
         minWidth: 210,
-        color: "#aab",
+        color: "var(--text-body)",
         fontSize: 13,
-        boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
       }}
     >
       {selNode && (
@@ -41,7 +41,7 @@ export function SelectionInfoPanel({
           <div
             style={{
               fontWeight: 700,
-              color: "#eef",
+              color: "var(--text-secondary)",
               marginBottom: 8,
               fontSize: 14,
             }}
@@ -54,13 +54,13 @@ export function SelectionInfoPanel({
                   ? "● Конец дороги"
                   : "↩ Промежуточный узел"}
           </div>
-          <div style={{ color: "#556" }}>
+          <div style={{ color: "var(--text-faint)" }}>
             Соединений:{" "}
-            <span style={{ color: "#99a" }}>{selNodeSegs.length}</span>
+            <span style={{ color: "var(--text-muted)" }}>{selNodeSegs.length}</span>
           </div>
-          <div style={{ color: "#556", marginBottom: 10 }}>
+          <div style={{ color: "var(--text-faint)", marginBottom: 10 }}>
             Координаты:{" "}
-            <span style={{ color: "#778" }}>
+            <span style={{ color: "var(--text-dim)" }}>
               {selNode.lat.toFixed(5)}, {selNode.lng.toFixed(5)}
             </span>
           </div>
@@ -71,8 +71,8 @@ export function SelectionInfoPanel({
               width: "100%",
               padding: "6px",
               textAlign: "center",
-              color: "#80c0ff",
-              borderColor: "#2a4a80",
+              color: "var(--accent)",
+              borderColor: "var(--accent-muted)",
             }}
           >
             + Добавить соединение
@@ -84,25 +84,25 @@ export function SelectionInfoPanel({
           <div
             style={{
               fontWeight: 700,
-              color: "#eef",
+              color: "var(--text-secondary)",
               marginBottom: 8,
               fontSize: 14,
             }}
           >
             Участок дороги
           </div>
-          <div style={{ color: "#778", marginBottom: 3 }}>
+          <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
             {selSeg.lanesBackward > 0
               ? `${selSeg.lanesForward} ↔ ${selSeg.lanesBackward} полос`
               : `${selSeg.lanesForward} полос → одностороннее`}
           </div>
-          <div style={{ color: "#778", marginBottom: 3 }}>
+          <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
             {selSeg.speedLimit} km/h
           </div>
-          <div style={{ color: "#778", marginBottom: 3 }}>
+          <div style={{ color: "var(--text-dim)", marginBottom: 3 }}>
             {SURFACE[selSeg.surface].label}
           </div>
-          <div style={{ color: "#778" }}>
+          <div style={{ color: "var(--text-dim)" }}>
             Размер: {(selSeg.displayScale ?? 1).toFixed(2)}×
           </div>
           {selSeg.coefficients && selSeg.coefficients.length > 0 && (
@@ -110,11 +110,11 @@ export function SelectionInfoPanel({
               style={{
                 marginTop: 6,
                 paddingTop: 6,
-                borderTop: "1px solid #1e1e3a",
+                borderTop: "1px solid var(--border-alt)",
               }}
             >
-              <div
-                style={{ color: "#556", fontSize: 11, marginBottom: 4 }}
+                <div
+                style={{ color: "var(--text-faint)", fontSize: 11, marginBottom: 4 }}
               >
                 Коэффициенты:
               </div>
@@ -141,7 +141,7 @@ export function SelectionInfoPanel({
                         flexShrink: 0,
                       }}
                     />
-                    <span style={{ color: "#778", fontSize: 12 }}>
+                    <span style={{ color: "var(--text-dim)", fontSize: 12 }}>
                       {cfg.label}
                       {!isBinary && cfg.unit
                         ? `: ${c.value} ${cfg.unit}`
@@ -152,18 +152,18 @@ export function SelectionInfoPanel({
               })}
             </div>
           )}
-          <div style={{ color: "#445", fontSize: 11, marginTop: 8 }}>
+          <div style={{ color: "var(--text-subtle)", fontSize: 11, marginTop: 8 }}>
             ПКМ для редактирования
           </div>
         </>
       )}
       <div
         style={{
-          color: "#334",
+          color: "var(--text-hint)",
           fontSize: 11,
           marginTop: 8,
           paddingTop: 8,
-          borderTop: "1px solid #1e1e3a",
+          borderTop: "1px solid var(--border-alt)",
         }}
       >
         Del / Backspace для удаления

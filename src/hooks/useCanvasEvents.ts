@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import type L from "leaflet";
 import type { Vec2, RoadNode, RoadSegment } from "../types";
-import { HANDLE_OFFSET, HANDLE_RADIUS, MIN_SEGMENT_LENGTH, CROSSING_DEFAULT_WIDTH } from "../constants";
+import { HANDLE_OFFSET, HANDLE_RADIUS, MIN_SEGMENT_LENGTH, CROSSING_DEFAULT_WIDTH, DEFAULT_TRAFFIC_INTENSITY } from "../constants";
 import { getScale, uid, toScreen, toGeo } from "../utils/coordinates";
 import { PARKING_DEFAULT_LENGTH_T } from "../constants";
 import {
@@ -316,6 +316,7 @@ export function useCanvasEvents({
                       speedLimit: dspd,
                       surface: dsurf,
                       displayScale: dDsp,
+                      trafficIntensity: DEFAULT_TRAFFIC_INTENSITY,
                     },
                   });
                 }
@@ -365,6 +366,7 @@ export function useCanvasEvents({
                   speedLimit: dspd,
                   surface: dsurf,
                   displayScale: dDsp,
+                  trafficIntensity: DEFAULT_TRAFFIC_INTENSITY,
                 },
               });
             }
@@ -396,6 +398,7 @@ export function useCanvasEvents({
                     speedLimit: dspd,
                     surface: dsurf,
                     displayScale: dDsp,
+                    trafficIntensity: DEFAULT_TRAFFIC_INTENSITY,
                   },
                 });
               }

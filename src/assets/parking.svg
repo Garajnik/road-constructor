@@ -1,14 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Road pocket outline -->
-  <path d="M8 48 L8 16 Q8 8 16 8 L48 8 Q56 8 56 16 L56 48" stroke="#40a0c0" stroke-width="3" fill="#40a0c020"/>
-  <!-- Parking lines (stall markings) -->
-  <line x1="18" y1="12" x2="18" y2="44" stroke="#40a0c0" stroke-width="2" stroke-dasharray="4 3"/>
-  <line x1="28" y1="12" x2="28" y2="44" stroke="#40a0c0" stroke-width="2" stroke-dasharray="4 3"/>
-  <line x1="38" y1="12" x2="38" y2="44" stroke="#40a0c0" stroke-width="2" stroke-dasharray="4 3"/>
-  <line x1="48" y1="12" x2="48" y2="44" stroke="#40a0c0" stroke-width="2" stroke-dasharray="4 3"/>
-  <!-- P symbol -->
-  <rect x="20" y="18" width="24" height="24" rx="5" fill="#40a0c0"/>
-  <text x="32" y="36" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="20" fill="#fff">P</text>
-  <!-- Label -->
-  <text x="32" y="56" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="9" fill="#40a0c0">PARKING</text>
+<svg width="104" height="104" viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_3_70)">
+<path d="M8.1 15.1C8.1 9.57713 12.5772 5.09998 18.1 5.09998H79.1C84.6228 5.09998 89.1 9.57713 89.1 15.1V76.1C89.1 81.6228 84.6228 86.1 79.1 86.1H18.1C12.5771 86.1 8.1 81.6228 8.1 76.1V15.1Z" fill="#3D1BD7"/>
+<path d="M51.7875 52.2875H40.35V44.3812H51.7875C53.475 44.3812 54.8292 44.1 55.85 43.5375C56.8917 42.975 57.6521 42.2041 58.1312 41.225C58.6312 40.225 58.8812 39.1 58.8812 37.85C58.8812 36.5583 58.6312 35.3604 58.1312 34.2562C57.6521 33.1312 56.8917 32.225 55.85 31.5375C54.8292 30.85 53.475 30.5062 51.7875 30.5062H44.0375V68.1H33.85V22.6H51.7875C55.4125 22.6 58.5167 23.2562 61.1 24.5687C63.7042 25.8812 65.6937 27.6833 67.0687 29.975C68.4646 32.2458 69.1625 34.85 69.1625 37.7875C69.1625 40.725 68.4646 43.2771 67.0687 45.4437C65.6937 47.6104 63.7042 49.2979 61.1 50.5062C58.5167 51.6937 55.4125 52.2875 51.7875 52.2875Z" fill="white"/>
+<path d="M79.1 4.59998C84.899 4.59998 89.6 9.30099 89.6 15.1V76.1C89.6 81.899 84.899 86.6 79.1 86.6H18.1C12.301 86.6 7.6 81.899 7.6 76.1V15.1C7.6 9.30099 12.301 4.59998 18.1 4.59998H79.1Z" stroke="white"/>
+</g>
+<defs>
+<filter id="filter0_d_3_70" x="-1.90735e-06" y="-2.47955e-05" width="103.2" height="103.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="3" dy="6"/>
+<feGaussianBlur stdDeviation="5.05"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_3_70"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_3_70" result="shape"/>
+</filter>
+</defs>
 </svg>

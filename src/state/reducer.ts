@@ -47,6 +47,7 @@ export interface AppState {
   draggingBusStop: { segId: string; busStopId: string } | null;
   draggingParking: { segId: string; parkingId: string } | null;
   draggingNodeId: string | null;
+  theme: "dark" | "light";
 }
 
 export const initialState: AppState = {
@@ -79,6 +80,7 @@ export const initialState: AppState = {
   draggingBusStop: null,
   draggingParking: null,
   draggingNodeId: null,
+  theme: "dark",
 };
 
 export type AppAction =
@@ -121,6 +123,7 @@ export type AppAction =
   | { type: "CLEAR_HOVER" }
   | { type: "CLEAR_ALL" }
   | { type: "DELETE_SELECTED" }
+  | { type: "SET_THEME"; theme: "dark" | "light" }
   | { type: "SPLIT_SEGMENT"; segId: string; t: number; setBuildFrom?: boolean }
   | { type: "SWITCH_TOOL"; tool: Tool }
   | { type: "UNDO" }
@@ -258,6 +261,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, draggingParking: action.value };
     case "SET_DRAGGING_NODE_ID":
       return { ...state, draggingNodeId: action.id };
+    case "SET_THEME":
+      return { ...state, theme: action.theme };
     case "CLEAR_HOVER":
       return {
         ...state,

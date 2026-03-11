@@ -17,6 +17,7 @@ type RefState = Pick<
   | "mouse"
   | "roadScale"
   | "dropTargetSegId"
+  | "theme"
 >;
 
 export function useCanvasRenderer(
@@ -45,6 +46,8 @@ export function useCanvasRenderer(
       mouse: s.mouse,
       scale,
       dropTargetSegId: s.dropTargetSegId,
+      theme: s.theme,
+      triggerRender: () => renderFromRef(map),
     });
   }, [canvasRef, stateRef]);
 
@@ -68,6 +71,8 @@ export function useCanvasRenderer(
       mouse: state.mouse,
       scale,
       dropTargetSegId: state.dropTargetSegId,
+      theme: state.theme,
+      triggerRender: () => { const m = mapRef.current; if (m) renderFromRef(m); },
     });
   }, [
     canvasRef,
@@ -83,6 +88,7 @@ export function useCanvasRenderer(
     state.mouse,
     state.roadScale,
     state.dropTargetSegId,
+    state.theme,
   ]);
 
   return renderFromRef;

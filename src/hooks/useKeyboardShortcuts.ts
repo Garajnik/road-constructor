@@ -41,6 +41,12 @@ export function useKeyboardShortcuts(
       if (e.key === "p") dispatch({ type: "SWITCH_TOOL", tool: "parking" });
       if (e.key === "a") dispatch({ type: "SWITCH_TOOL", tool: "split" });
       if (e.key === "Delete" || e.key === "Backspace") {
+        const target = e.target as HTMLElement;
+        const isEditable =
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable;
+        if (isEditable) return;
         const { selectedId: sid } = stateRef.current;
         if (!sid) return;
         e.preventDefault();

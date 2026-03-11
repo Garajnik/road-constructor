@@ -2,7 +2,7 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        color: "#556",
+        color: "var(--text-faint)",
         fontSize: 11,
         marginBottom: 6,
         textTransform: "uppercase",

@@ -167,3 +167,4 @@ export const PARKING_MAX_LENGTH_T = 0.5;
 export const CROSSING_DEFAULT_WIDTH = 1;
 export const CROSSING_MIN_WIDTH = 0.2;
 export const CROSSING_MAX_WIDTH = 1;
+export const DEFAULT_TRAFFIC_INTENSITY = 500;

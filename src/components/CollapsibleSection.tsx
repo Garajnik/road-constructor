@@ -25,7 +25,7 @@ export function CollapsibleSection({
           marginBottom: expanded ? 6 : 0,
           background: "none",
           border: "none",
-          color: "#556",
+          color: "var(--text-faint)",
           fontSize: 11,
           textTransform: "uppercase",
           letterSpacing: "0.06em",

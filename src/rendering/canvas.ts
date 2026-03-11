@@ -16,6 +16,24 @@ import {
   handlePos,
   nearestNodeSq,
 } from "../utils/geometry";
+import slopeSvgUrl from "../assets/slope.svg?url";
+
+const _imgCache = new Map<string, HTMLImageElement | "loading">();
+
+function loadImg(url: string, onLoad?: () => void): HTMLImageElement | null {
+  const cached = _imgCache.get(url);
+  if (cached && cached !== "loading") return cached;
+  if (!cached) {
+    _imgCache.set(url, "loading");
+    const img = new Image();
+    img.onload = () => {
+      _imgCache.set(url, img);
+      onLoad?.();
+    };
+    img.src = url;
+  }
+  return null;
+}
 
 export interface RenderOptions {
   ctx: CanvasRenderingContext2D;
@@ -30,6 +48,8 @@ export interface RenderOptions {
   mouse: Vec2 | null;
   scale: number;
   dropTargetSegId: string | null;
+  theme?: "dark" | "light";
+  triggerRender?: () => void;
 }
 
 function drawArrow(
@@ -69,7 +89,16 @@ export function render(opts: RenderOptions) {
     mouse,
     scale,
     dropTargetSegId,
+    theme = "dark",
+    triggerRender,
   } = opts;
+
+  const light = theme === "light";
+  const textColor = light ? "#1a1a2e" : "rgba(255,255,255,0.9)";
+  const textMuted = light ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.22)";
+  const crossingStripe = light ? "rgba(0,0,0,0.85)" : "rgba(255,255,255,0.95)";
+  const nodeHoverStroke = light ? "#64748b" : "#aaa";
+  const segHoverBorder = light ? "#94a3b8" : "#2a2a40";
 
   const W = ctx.canvas.width,
     H = ctx.canvas.height;
@@ -110,7 +139,7 @@ export function render(opts: RenderOptions) {
     ctx.beginPath();
     ctx.moveTo(sx, sy);
     ctx.lineTo(ex, ey);
-    ctx.strokeStyle = isSel ? "#1e4a90" : isHov ? "#2a2a40" : border;
+    ctx.strokeStyle = isSel ? "#1e4a90" : isHov ? segHoverBorder : border;
     ctx.lineWidth = rw + 6 * scale;
     ctx.stroke();
 
@@ -158,7 +187,7 @@ export function render(opts: RenderOptions) {
     ctx.fillRect(-hs, -hs, hs * 2, hs * 2);
 
     if (isSel || isHov || isHandleHov) {
-      ctx.strokeStyle = isSel ? "#80c0ff" : isIntersection ? "#ffb400" : "#aaa";
+      ctx.strokeStyle = isSel ? "#2563eb" : isIntersection ? "#ea580c" : nodeHoverStroke;
       ctx.lineWidth = (isHov || isHandleHov ? 1.5 : 2) * scale;
       ctx.strokeRect(-hs - 0.5, -hs - 0.5, hs * 2 + 1, hs * 2 + 1);
     }
@@ -278,7 +307,7 @@ export function render(opts: RenderOptions) {
 
     const midX = (sx + ex) / 2,
       midY = (sy + ey) / 2;
-    ctx.fillStyle = "rgba(255,255,255,0.22)";
+    ctx.fillStyle = textMuted;
     ctx.font = `bold ${Math.max(8, Math.round(10 * scale))}px monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -323,7 +352,7 @@ export function render(opts: RenderOptions) {
       for (let i = 0; i < NUM_STRIPES; i++) {
         const totalSpan = stripePitch * (NUM_STRIPES - 1) + stripeWidth;
         const y0 = -totalSpan / 2 + i * stripePitch;
-        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.fillStyle = crossingStripe;
         ctx.fillRect(-cw / 2, y0, cw, stripeWidth);
       }
       ctx.restore();
@@ -483,6 +512,8 @@ export function render(opts: RenderOptions) {
     const r = Math.max(6, 8 * scale);
     const n = coeffs.length;
 
+    const roadAngle = Math.atan2(b.y - a.y, b.x - a.x);
+
     for (let ci = 0; ci < n; ci++) {
       const c = coeffs[ci];
       const cfg = COEFF[c.type];
@@ -500,26 +531,60 @@ export function render(opts: RenderOptions) {
       ctx.lineWidth = 1 * scale;
       ctx.stroke();
 
-      ctx.beginPath();
-      ctx.arc(mx, my, r, 0, Math.PI * 2);
-      ctx.fillStyle = cfg.color;
-      ctx.fill();
-      ctx.strokeStyle = "#000";
-      ctx.lineWidth = 1.2 * scale;
-      ctx.stroke();
-
-      ctx.fillStyle = "#fff";
-      ctx.font = `bold ${Math.max(7, Math.round(9 * scale))}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(cfg.symbol, mx, my);
-
-      if (scale >= 0.7) {
-        const isBinary = cfg.max === 1 && cfg.min === 0 && cfg.step === 1;
-        if (!isBinary) {
+      if (c.type === "road_slope") {
+        const slopeImg = loadImg(slopeSvgUrl, triggerRender);
+        const imgW = Math.max(80, 120 * scale);
+        const imgH = imgW * (44 / 276);
+        if (slopeImg) {
+          ctx.save();
+          ctx.translate(mx, my);
+          // Positive slope = uphill toward 'to' → high end (left of SVG) points toward 'to'
+          ctx.rotate(roadAngle + (c.value > 0 ? Math.PI : 0));
+          ctx.drawImage(slopeImg, -imgW / 2, -imgH / 2, imgW, imgH);
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(mx, my, r, 0, Math.PI * 2);
+          ctx.fillStyle = cfg.color;
+          ctx.fill();
+          ctx.strokeStyle = light ? "#64748b" : "#000";
+          ctx.lineWidth = 1.2 * scale;
+          ctx.stroke();
+          ctx.fillStyle = textColor;
+          ctx.font = `bold ${Math.max(7, Math.round(9 * scale))}px sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(cfg.symbol, mx, my);
+        }
+        if (scale >= 0.7) {
           ctx.fillStyle = cfg.color;
           ctx.font = `${Math.max(7, Math.round(8 * scale))}px sans-serif`;
-          ctx.fillText(`${c.value}${cfg.unit}`, mx, my + r + 7 * scale);
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(`${c.value}${cfg.unit}`, mx, my + imgH / 2 + 7 * scale);
+        }
+      } else {
+        ctx.beginPath();
+        ctx.arc(mx, my, r, 0, Math.PI * 2);
+        ctx.fillStyle = cfg.color;
+        ctx.fill();
+        ctx.strokeStyle = light ? "#64748b" : "#000";
+        ctx.lineWidth = 1.2 * scale;
+        ctx.stroke();
+
+        ctx.fillStyle = textColor;
+        ctx.font = `bold ${Math.max(7, Math.round(9 * scale))}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(cfg.symbol, mx, my);
+
+        if (scale >= 0.7) {
+          const isBinary = cfg.max === 1 && cfg.min === 0 && cfg.step === 1;
+          if (!isBinary) {
+            ctx.fillStyle = cfg.color;
+            ctx.font = `${Math.max(7, Math.round(8 * scale))}px sans-serif`;
+            ctx.fillText(`${c.value}${cfg.unit}`, mx, my + r + 7 * scale);
+          }
         }
       }
     }
@@ -571,17 +636,17 @@ export function render(opts: RenderOptions) {
         ctx.beginPath();
         ctx.arc(hp.x, hp.y, hr, 0, Math.PI * 2);
         ctx.fillStyle = isHov
-          ? "#1e4a9a"
+          ? (light ? "#93c5fd" : "#1e4a9a")
           : isBuildTarget
-            ? "#1a3060"
-            : "#111828";
+            ? (light ? "#bfdbfe" : "#1a3060")
+            : (light ? "#e2e8f0" : "#111828");
         ctx.fill();
-        ctx.strokeStyle = isHov ? "#80c0ff" : "#3a60a0";
+        ctx.strokeStyle = isHov ? (light ? "#2563eb" : "#80c0ff") : (light ? "#60a5fa" : "#3a60a0");
         ctx.lineWidth = (isHov ? 2 : 1.5) * scale;
         ctx.stroke();
 
         const s = 4 * scale;
-        ctx.strokeStyle = isHov ? "#a0d0ff" : "#4a80c0";
+        ctx.strokeStyle = isHov ? (light ? "#3b82f6" : "#a0d0ff") : (light ? "#2563eb" : "#4a80c0");
         ctx.lineWidth = (isHov ? 2 : 1.5) * scale;
         ctx.beginPath();
         ctx.moveTo(hp.x - s, hp.y);

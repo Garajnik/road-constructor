@@ -23,9 +23,9 @@ export function LaneCounter({
             width: 26,
             height: 26,
             borderRadius: 4,
-            border: "1px solid #222240",
-            background: "#0d0d1a",
-            color: "#80c0ff",
+            border: "1px solid var(--border)",
+            background: "var(--chip-inactive-bg)",
+            color: "var(--accent)",
             cursor: "pointer",
             fontSize: 18,
             lineHeight: 1,
@@ -36,7 +36,7 @@ export function LaneCounter({
         </button>
         <span
           style={{
-            color: "#80c0ff",
+            color: "var(--accent)",
             fontWeight: 700,
             fontSize: 18,
             minWidth: 18,
@@ -51,9 +51,9 @@ export function LaneCounter({
             width: 26,
             height: 26,
             borderRadius: 4,
-            border: "1px solid #222240",
-            background: "#0d0d1a",
-            color: "#80c0ff",
+            border: "1px solid var(--border)",
+            background: "var(--chip-inactive-bg)",
+            color: "var(--accent)",
             cursor: "pointer",
             fontSize: 18,
             lineHeight: 1,
@@ -70,7 +70,7 @@ export function LaneCounter({
                 width: 7,
                 height: 18,
                 borderRadius: 2,
-                background: "#2a5a9a",
+                background: "var(--accent-muted)",
               }}
             />
           ))}

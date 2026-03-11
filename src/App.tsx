@@ -23,7 +23,15 @@ export default function App() {
   const panRef = useRef({ active: false, startX: 0, startY: 0, didPan: false });
   const preDragSnapshotRef = useRef<HistorySnapshot | null>(null);
 
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, undefined, () => {
+    const saved = localStorage.getItem("road-constructor-theme") as "dark" | "light" | null;
+    const theme = saved === "dark" || saved === "light" ? saved : "dark";
+    return { ...initialState, theme };
+  });
+
+  useEffect(() => {
+    localStorage.setItem("road-constructor-theme", state.theme);
+  }, [state.theme]);
 
   const draggingCoeffRef = useRef(state.draggingCoeff);
   const draggingCrossingFromPaletteRef = useRef(state.draggingCrossingFromPalette);
@@ -134,17 +142,20 @@ export default function App() {
 
   return (
     <div
+      data-theme={state.theme}
       style={{
         width: "100vw",
         height: "100vh",
         display: "flex",
         flexDirection: "column",
-        background: "#0d0d1a",
+        background: "var(--app-bg)",
         overflow: "hidden",
         fontFamily: "system-ui, sans-serif",
       }}
     >
       <Toolbar
+        theme={state.theme}
+        setTheme={(t) => dispatch({ type: "SET_THEME", theme: t })}
         tool={state.tool}
         setTool={(t) => dispatch({ type: "SET_TOOL", tool: t })}
         defLanesF={state.defLanesF}
@@ -170,7 +181,7 @@ export default function App() {
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
         <div
           ref={mapContainerRef}
-          style={{ position: "absolute", inset: 0, zIndex: 0, background: "#0d0d1a" }}
+          style={{ position: "absolute", inset: 0, zIndex: 0, background: "var(--app-bg)" }}
         />
         <canvas
           ref={canvasRef}
@@ -274,10 +285,10 @@ export default function App() {
               width: 32,
               height: 32,
               borderRadius: "6px 6px 0 0",
-              border: "1px solid #1e1e3e",
+              border: "1px solid var(--border)",
               borderBottom: "none",
-              background: "#12122a",
-              color: "#80c0ff",
+              background: "var(--zoom-btn-bg)",
+              color: "var(--zoom-btn-color)",
               cursor: "pointer",
               fontSize: 18,
               lineHeight: 1,
@@ -293,14 +304,14 @@ export default function App() {
             style={{
               width: 32,
               height: 26,
-              background: "#12122a",
-              border: "1px solid #1e1e3e",
+              background: "var(--zoom-btn-bg)",
+              border: "1px solid var(--border)",
               borderTop: "none",
               borderBottom: "none",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "#556",
+              color: "var(--zoom-label-color)",
               fontSize: 10,
               fontFamily: "monospace",
             }}
@@ -314,10 +325,10 @@ export default function App() {
               width: 32,
               height: 32,
               borderRadius: "0 0 6px 6px",
-              border: "1px solid #1e1e3e",
+              border: "1px solid var(--border)",
               borderTop: "none",
-              background: "#12122a",
-              color: "#80c0ff",
+              background: "var(--zoom-btn-bg)",
+              color: "var(--zoom-btn-color)",
               cursor: "pointer",
               fontSize: 18,
               lineHeight: 1,

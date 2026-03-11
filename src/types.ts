@@ -69,6 +69,8 @@ export interface RoadSegment {
   displayScale?: number;
   /** Traffic intensity (cars per hour). Used for Service Level from Congestion Z = N/P. */
   trafficIntensity?: number;
+  /** Quadratic Bézier control point in geo coordinates. Absent = straight segment. */
+  cp?: { lat: number; lng: number };
   /** Obstacles/coefficients affecting vehicle behavior on this segment. */
   coefficients?: RoadCoefficient[];
   /** Pedestrian crossings at positions along this segment. */

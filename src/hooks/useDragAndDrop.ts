@@ -34,10 +34,12 @@ interface UseDragAndDropArgs {
     startY: number;
     didMove: boolean;
   } | null>;
+  draggingCpRef: React.RefObject<{ segId: string; didMove: boolean } | null>;
   justFinishedCrossingDragRef: React.RefObject<boolean>;
   justFinishedBusStopDragRef: React.RefObject<boolean>;
   justFinishedParkingDragRef: React.RefObject<boolean>;
   justFinishedNodeDragRef: React.RefObject<boolean>;
+  justFinishedCpDragRef: React.RefObject<boolean>;
   preDragSnapshotRef: React.MutableRefObject<HistorySnapshot | null>;
 }
 
@@ -55,10 +57,12 @@ export function useDragAndDrop({
   draggingBusStopRef,
   draggingParkingRef,
   draggingNodeRef,
+  draggingCpRef,
   justFinishedCrossingDragRef,
   justFinishedBusStopDragRef,
   justFinishedParkingDragRef,
   justFinishedNodeDragRef,
+  justFinishedCpDragRef,
   preDragSnapshotRef,
 }: UseDragAndDropArgs) {
   // Global panning listeners
@@ -448,6 +452,43 @@ export function useDragAndDrop({
     justFinishedNodeDragRef,
     preDragSnapshotRef,
   ]);
+
+  // Global CP drag listeners
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const dc = draggingCpRef.current;
+      if (!dc) return;
+      const map = mapRef.current;
+      if (!map) return;
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      const geo = toGeo(map, pos);
+      dc.didMove = true;
+      dispatch({ type: "SET_SEGMENT_CP", segId: dc.segId, lat: geo.lat, lng: geo.lng });
+    };
+    const onUp = () => {
+      const dc = draggingCpRef.current;
+      if (!dc) return;
+      if (dc.didMove && preDragSnapshotRef.current) {
+        dispatch({ type: "PUSH_SNAPSHOT", snapshot: preDragSnapshotRef.current });
+        justFinishedCpDragRef.current = true;
+      }
+      preDragSnapshotRef.current = null;
+      draggingCpRef.current = null;
+      dispatch({ type: "SET_DRAGGING_CP_SEG_ID", id: null });
+      if (canvasRef.current) {
+        const t = stateRef.current.tool;
+        canvasRef.current.style.cursor = t === "select" ? "default" : "crosshair";
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+  }, [canvasRef, mapRef, stateRef, dispatch, draggingCpRef, justFinishedCpDragRef, preDragSnapshotRef]);
 
   const handleDragOver = useCallback(
     (e: React.DragEvent<HTMLCanvasElement>) => {

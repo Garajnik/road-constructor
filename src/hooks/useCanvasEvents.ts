@@ -16,9 +16,13 @@ import {
   nearestBusStop,
   nearestParkingSpace,
   nearestSegmentWithT,
+  nearestSpeedLimitMarker,
   detectSide,
 } from "../utils/geometry";
 import type { AppAction, AppState, HistorySnapshot } from "../state/reducer";
+
+/** Radius for Bézier CP handle hit detection (screen pixels). */
+const CP_HANDLE_RADIUS = 10;
 
 type RefState = Pick<
   AppState,
@@ -45,10 +49,12 @@ interface UseCanvasEventsArgs {
   draggingBusStopRef: React.RefObject<{ segId: string; busStopId: string } | null>;
   draggingParkingRef: React.RefObject<{ segId: string; parkingId: string } | null>;
   draggingNodeRef: React.RefObject<{ nodeId: string; startX: number; startY: number; didMove: boolean } | null>;
+  draggingCpRef: React.RefObject<{ segId: string; didMove: boolean } | null>;
   justFinishedCrossingDragRef: React.RefObject<boolean>;
   justFinishedBusStopDragRef: React.RefObject<boolean>;
   justFinishedParkingDragRef: React.RefObject<boolean>;
   justFinishedNodeDragRef: React.RefObject<boolean>;
+  justFinishedCpDragRef: React.RefObject<boolean>;
   preDragSnapshotRef: React.MutableRefObject<HistorySnapshot | null>;
 }
 
@@ -62,10 +68,12 @@ export function useCanvasEvents({
   draggingBusStopRef,
   draggingParkingRef,
   draggingNodeRef,
+  draggingCpRef,
   justFinishedCrossingDragRef,
   justFinishedBusStopDragRef,
   justFinishedParkingDragRef,
   justFinishedNodeDragRef,
+  justFinishedCpDragRef,
   preDragSnapshotRef,
 }: UseCanvasEventsArgs) {
   const getPos = useCallback((e: React.MouseEvent): Vec2 => {
@@ -136,6 +144,31 @@ export function useCanvasEvents({
             dispatch({ type: "SET_DRAGGING_PARKING", value });
           }
         }
+        // CP handle drag detection (select tool only)
+        if (t === "select") {
+          const screenNodes = ns.map((n) => toScreen(map, n));
+          const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
+          const { selectedId: selId } = stateRef.current;
+          for (const seg of segs) {
+            // CP handle only active on the selected segment or near a CP
+            if (!seg.cp && seg.id !== selId) continue;
+            const a = screenMap.get(seg.fromId), b = screenMap.get(seg.toId);
+            if (!a || !b) continue;
+            let hpX: number, hpY: number;
+            if (seg.cp) {
+              const cpScreen = map.latLngToContainerPoint([seg.cp.lat, seg.cp.lng]);
+              hpX = cpScreen.x; hpY = cpScreen.y;
+            } else {
+              hpX = (a.x + b.x) / 2; hpY = (a.y + b.y) / 2;
+            }
+            if (dist(pos, { x: hpX, y: hpY }) <= CP_HANDLE_RADIUS) {
+              preDragSnapshotRef.current = { nodes: ns, segments: segs };
+              draggingCpRef.current = { segId: seg.id, didMove: false };
+              dispatch({ type: "SET_DRAGGING_CP_SEG_ID", id: seg.id });
+              return;
+            }
+          }
+        }
         const anyDrag = draggingCrossingRef.current || draggingBusStopRef.current || draggingParkingRef.current;
         if ((t === "select" || t === "road") && !anyDrag) {
           const scale = getScale(map.getZoom(), rs);
@@ -193,6 +226,15 @@ export function useCanvasEvents({
 
       const pos = getPos(e);
       dispatch({ type: "SET_MOUSE", pos });
+
+      // CP drag in progress
+      if (draggingCpRef.current) {
+        const geo = toGeo(map, pos);
+        draggingCpRef.current.didMove = true;
+        dispatch({ type: "SET_SEGMENT_CP", segId: draggingCpRef.current.segId, lat: geo.lat, lng: geo.lng });
+        return;
+      }
+
       const {
         nodes: ns,
         segments: segs,
@@ -205,6 +247,31 @@ export function useCanvasEvents({
       const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
       const screenBf = bf ? toScreen(map, bf) : null;
       const hr = HANDLE_RADIUS * scale;
+
+      // CP handle hover detection (select tool)
+      if (t === "select") {
+        const { selectedId: selId } = stateRef.current;
+        let hovCpId: string | null = null;
+        for (const seg of segs) {
+          if (!seg.cp && seg.id !== selId) continue;
+          const a = screenMap.get(seg.fromId), b = screenMap.get(seg.toId);
+          if (!a || !b) continue;
+          let hpX: number, hpY: number;
+          if (seg.cp) {
+            const cpScreen = map.latLngToContainerPoint([seg.cp.lat, seg.cp.lng]);
+            hpX = cpScreen.x; hpY = cpScreen.y;
+          } else {
+            hpX = (a.x + b.x) / 2; hpY = (a.y + b.y) / 2;
+          }
+          if (dist(pos, { x: hpX, y: hpY }) <= CP_HANDLE_RADIUS) {
+            hovCpId = seg.id;
+            break;
+          }
+        }
+        dispatch({ type: "SET_HOVERED_CP_SEG_ID", id: hovCpId });
+      } else {
+        dispatch({ type: "SET_HOVERED_CP_SEG_ID", id: null });
+      }
 
       if (t !== "delete") {
         for (const sn of screenNodes) {
@@ -267,6 +334,10 @@ export function useCanvasEvents({
       }
       if (justFinishedNodeDragRef.current) {
         justFinishedNodeDragRef.current = false;
+        return;
+      }
+      if (justFinishedCpDragRef.current) {
+        justFinishedCpDragRef.current = false;
         return;
       }
       const pos = getPos(e);
@@ -479,6 +550,33 @@ export function useCanvasEvents({
           dispatch({ type: "SPLIT_SEGMENT", segId: snap.seg.id, t: safeT });
         }
       } else if (t === "select") {
+        const cpMap = new Map<string, { x: number; y: number }>();
+        for (const s of segs) {
+          if (s.cp) {
+            const pt = map.latLngToContainerPoint([s.cp.lat, s.cp.lng]);
+            cpMap.set(s.id, { x: pt.x, y: pt.y });
+          }
+        }
+        const snapSpeedLimit = nearestSpeedLimitMarker(
+          screenMap,
+          segs,
+          pos,
+          scale,
+          cpMap,
+        );
+        if (snapSpeedLimit) {
+          dispatch({
+            type: "SET_EDIT_PANEL",
+            panel: {
+              segId: snapSpeedLimit.id,
+              x: e.clientX,
+              y: e.clientY,
+              segmentT: 0.5,
+            },
+          });
+          dispatch({ type: "SET_SELECTED_ID", id: snapSpeedLimit.id });
+          return;
+        }
         const snapN = nearestNodeSq(screenNodes, segs, pos, scale);
         if (snapN) {
           dispatch({ type: "TOGGLE_SELECTED_ID", id: snapN.id });
@@ -614,11 +712,44 @@ export function useCanvasEvents({
     dispatch({ type: "UPDATE_SEGMENT", segment: updated });
   }, [dispatch]);
 
+  const handleDoubleClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (e.button !== 0) return;
+      const map = mapRef.current;
+      if (!map) return;
+      const { segments: segs, nodes: ns, tool: t, roadScale: rs } = stateRef.current;
+      if (t !== "select") return;
+      const pos = getPos(e);
+      const screenNodes = ns.map((n) => toScreen(map, n));
+      const screenMap = new Map(screenNodes.map((n) => [n.id, n]));
+      const { selectedId: selId } = stateRef.current;
+      for (const seg of segs) {
+        if (!seg.cp && seg.id !== selId) continue;
+        const a = screenMap.get(seg.fromId), b = screenMap.get(seg.toId);
+        if (!a || !b) continue;
+        let hpX: number, hpY: number;
+        if (seg.cp) {
+          const cpScreen = map.latLngToContainerPoint([seg.cp.lat, seg.cp.lng]);
+          hpX = cpScreen.x; hpY = cpScreen.y;
+        } else {
+          hpX = (a.x + b.x) / 2; hpY = (a.y + b.y) / 2;
+        }
+        void rs;
+        if (dist(pos, { x: hpX, y: hpY }) <= CP_HANDLE_RADIUS * 1.5) {
+          dispatch({ type: "CLEAR_SEGMENT_CP", segId: seg.id });
+          return;
+        }
+      }
+    },
+    [getPos, mapRef, stateRef, dispatch],
+  );
+
   return {
     handleMouseDown,
     handleMouseMove,
     handleClick,
     handleContextMenu,
     handleSegmentChange,
+    handleDoubleClick,
   };
 }

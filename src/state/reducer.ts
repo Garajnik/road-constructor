@@ -47,6 +47,8 @@ export interface AppState {
   draggingBusStop: { segId: string; busStopId: string } | null;
   draggingParking: { segId: string; parkingId: string } | null;
   draggingNodeId: string | null;
+  draggingCpSegId: string | null;
+  hoveredCpSegId: string | null;
   theme: "dark" | "light";
 }
 
@@ -80,6 +82,8 @@ export const initialState: AppState = {
   draggingBusStop: null,
   draggingParking: null,
   draggingNodeId: null,
+  draggingCpSegId: null,
+  hoveredCpSegId: null,
   theme: "dark",
 };
 
@@ -120,6 +124,10 @@ export type AppAction =
   | { type: "SET_DRAGGING_BUS_STOP"; value: { segId: string; busStopId: string } | null }
   | { type: "SET_DRAGGING_PARKING"; value: { segId: string; parkingId: string } | null }
   | { type: "SET_DRAGGING_NODE_ID"; id: string | null }
+  | { type: "SET_DRAGGING_CP_SEG_ID"; id: string | null }
+  | { type: "SET_HOVERED_CP_SEG_ID"; id: string | null }
+  | { type: "SET_SEGMENT_CP"; segId: string; lat: number; lng: number }
+  | { type: "CLEAR_SEGMENT_CP"; segId: string }
   | { type: "CLEAR_HOVER" }
   | { type: "CLEAR_ALL" }
   | { type: "DELETE_SELECTED" }
@@ -261,6 +269,30 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, draggingParking: action.value };
     case "SET_DRAGGING_NODE_ID":
       return { ...state, draggingNodeId: action.id };
+    case "SET_DRAGGING_CP_SEG_ID":
+      return { ...state, draggingCpSegId: action.id };
+    case "SET_HOVERED_CP_SEG_ID":
+      return { ...state, hoveredCpSegId: action.id };
+    case "SET_SEGMENT_CP":
+      return {
+        ...state,
+        segments: state.segments.map((seg) =>
+          seg.id === action.segId
+            ? { ...seg, cp: { lat: action.lat, lng: action.lng } }
+            : seg,
+        ),
+      };
+    case "CLEAR_SEGMENT_CP": {
+      const s = withHistory(state);
+      return {
+        ...s,
+        segments: s.segments.map((seg) => {
+          if (seg.id !== action.segId) return seg;
+          const { cp: _cp, ...rest } = seg;
+          return rest as typeof seg;
+        }),
+      };
+    }
     case "SET_THEME":
       return { ...state, theme: action.theme };
     case "CLEAR_HOVER":
@@ -271,6 +303,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         hoveredSegId: null,
         hoveredHandle: null,
         hoveredCrossingId: null,
+        hoveredCpSegId: null,
       };
     case "CLEAR_ALL": {
       const s = withHistory(state);

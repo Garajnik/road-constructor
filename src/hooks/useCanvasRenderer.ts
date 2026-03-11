@@ -2,6 +2,7 @@ import { useEffect, useCallback } from "react";
 import type L from "leaflet";
 import { getScale, toScreen } from "../utils/coordinates";
 import { render } from "../rendering/canvas";
+import type { Vec2 } from "../types";
 import type { AppState } from "../state/reducer";
 
 type RefState = Pick<
@@ -17,8 +18,21 @@ type RefState = Pick<
   | "mouse"
   | "roadScale"
   | "dropTargetSegId"
+  | "hoveredCpSegId"
+  | "draggingCpSegId"
   | "theme"
 >;
+
+/** Convert each segment's geo-space cp to screen-space. */
+function buildCpMap(map: L.Map, segments: AppState["segments"]): Map<string, Vec2> {
+  const result = new Map<string, Vec2>();
+  for (const seg of segments) {
+    if (!seg.cp) continue;
+    const pt = map.latLngToContainerPoint([seg.cp.lat, seg.cp.lng]);
+    result.set(seg.id, { x: pt.x, y: pt.y });
+  }
+  return result;
+}
 
 export function useCanvasRenderer(
   canvasRef: React.RefObject<HTMLCanvasElement | null>,
@@ -33,6 +47,7 @@ export function useCanvasRenderer(
     const scale = getScale(map.getZoom(), s.roadScale);
     const screenNodes = s.nodes.map((n) => toScreen(map, n));
     const screenBf = s.buildFrom ? toScreen(map, s.buildFrom) : null;
+    const cpMap = buildCpMap(map, s.segments);
     render({
       ctx: canvas.getContext("2d")!,
       nodes: screenNodes,
@@ -46,6 +61,9 @@ export function useCanvasRenderer(
       mouse: s.mouse,
       scale,
       dropTargetSegId: s.dropTargetSegId,
+      cpMap,
+      hoveredCpSegId: s.hoveredCpSegId,
+      draggingCpSegId: s.draggingCpSegId,
       theme: s.theme,
       triggerRender: () => renderFromRef(map),
     });
@@ -58,6 +76,7 @@ export function useCanvasRenderer(
     const scale = getScale(map.getZoom(), state.roadScale);
     const screenNodes = state.nodes.map((n) => toScreen(map, n));
     const screenBf = state.buildFrom ? toScreen(map, state.buildFrom) : null;
+    const cpMap = buildCpMap(map, state.segments);
     render({
       ctx: canvas.getContext("2d")!,
       nodes: screenNodes,
@@ -71,6 +90,9 @@ export function useCanvasRenderer(
       mouse: state.mouse,
       scale,
       dropTargetSegId: state.dropTargetSegId,
+      cpMap,
+      hoveredCpSegId: state.hoveredCpSegId,
+      draggingCpSegId: state.draggingCpSegId,
       theme: state.theme,
       triggerRender: () => { const m = mapRef.current; if (m) renderFromRef(m); },
     });
@@ -88,6 +110,8 @@ export function useCanvasRenderer(
     state.mouse,
     state.roadScale,
     state.dropTargetSegId,
+    state.hoveredCpSegId,
+    state.draggingCpSegId,
     state.theme,
   ]);
 

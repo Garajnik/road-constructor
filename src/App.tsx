@@ -46,10 +46,12 @@ export default function App() {
     startY: number;
     didMove: boolean;
   } | null>(null);
+  const draggingCpRef = useRef<{ segId: string; didMove: boolean } | null>(null);
   const justFinishedCrossingDragRef = useRef(false);
   const justFinishedBusStopDragRef = useRef(false);
   const justFinishedParkingDragRef = useRef(false);
   const justFinishedNodeDragRef = useRef(false);
+  const justFinishedCpDragRef = useRef(false);
 
   const stateRef = useRef(state);
   useLayoutEffect(() => {
@@ -62,6 +64,8 @@ export default function App() {
     draggingBusStopRef.current = state.draggingBusStop;
     draggingParkingRef.current = state.draggingParking;
   });
+
+  // draggingCpRef and justFinishedCpDragRef are managed directly in hooks (not synced from state)
 
   const renderFromRef = useCanvasRenderer(canvasRef, mapRef, stateRef, state);
   const { zoomIn, zoomOut } = useMap(canvasRef, mapContainerRef, mapRef, renderFromRef);
@@ -92,6 +96,7 @@ export default function App() {
     handleClick,
     handleContextMenu,
     handleSegmentChange,
+    handleDoubleClick,
   } = useCanvasEvents({
     canvasRef,
     mapRef,
@@ -102,10 +107,12 @@ export default function App() {
     draggingBusStopRef,
     draggingParkingRef,
     draggingNodeRef,
+    draggingCpRef,
     justFinishedCrossingDragRef,
     justFinishedBusStopDragRef,
     justFinishedParkingDragRef,
     justFinishedNodeDragRef,
+    justFinishedCpDragRef,
     preDragSnapshotRef,
   });
 
@@ -123,10 +130,12 @@ export default function App() {
     draggingBusStopRef,
     draggingParkingRef,
     draggingNodeRef,
+    draggingCpRef,
     justFinishedCrossingDragRef,
     justFinishedBusStopDragRef,
     justFinishedParkingDragRef,
     justFinishedNodeDragRef,
+    justFinishedCpDragRef,
     preDragSnapshotRef,
   });
 
@@ -192,16 +201,18 @@ export default function App() {
             height: "100%",
             zIndex: 1,
             cursor:
-              state.draggingCrossing || state.draggingBusStop || state.draggingParking || state.draggingNodeId
+              state.draggingCrossing || state.draggingBusStop || state.draggingParking || state.draggingNodeId || state.draggingCpSegId
                 ? "grabbing"
-                : (state.hoveredNodeId &&
-                    (state.tool === "select" || state.tool === "road")) ||
-                    (state.hoveredCrossingId &&
-                      (state.tool === "select" || state.tool === "crossing"))
+                : state.hoveredCpSegId && state.tool === "select"
                   ? "grab"
-                  : state.tool === "select"
-                    ? "default"
-                    : "crosshair",
+                  : (state.hoveredNodeId &&
+                      (state.tool === "select" || state.tool === "road")) ||
+                      (state.hoveredCrossingId &&
+                        (state.tool === "select" || state.tool === "crossing"))
+                    ? "grab"
+                    : state.tool === "select"
+                      ? "default"
+                      : "crosshair",
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -211,6 +222,7 @@ export default function App() {
             }
           }}
           onClick={handleClick}
+          onDoubleClick={handleDoubleClick}
           onContextMenu={handleContextMenu}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
@@ -265,6 +277,20 @@ export default function App() {
         )}
 
         <Legend />
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            width: 200,
+            height: 20,
+            background: "var(--app-bg)",
+            zIndex: 5,
+            pointerEvents: "none",
+          }}
+          aria-hidden
+        />
 
         <div
           style={{

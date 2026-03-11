@@ -9,6 +9,58 @@ import type {
   ParkingSpace,
 } from "../types";
 
+// ── Quadratic Bézier helpers ──────────────────────────────────────────────────
+
+/** Point on quadratic Bézier curve at parameter t ∈ [0,1]. */
+export function bezierPoint(a: Vec2, cp: Vec2, b: Vec2, t: number): Vec2 {
+  const mt = 1 - t;
+  return {
+    x: mt * mt * a.x + 2 * mt * t * cp.x + t * t * b.x,
+    y: mt * mt * a.y + 2 * mt * t * cp.y + t * t * b.y,
+  };
+}
+
+/** Tangent direction (not normalised) on quadratic Bézier at parameter t. */
+export function bezierTangent(a: Vec2, cp: Vec2, b: Vec2, t: number): Vec2 {
+  const mt = 1 - t;
+  return {
+    x: 2 * mt * (cp.x - a.x) + 2 * t * (b.x - cp.x),
+    y: 2 * mt * (cp.y - a.y) + 2 * t * (b.y - cp.y),
+  };
+}
+
+/** Approximate nearest distance from point p to a quadratic Bézier curve (30 samples). */
+export function distToCurve(p: Vec2, a: Vec2, cp: Vec2, b: Vec2): number {
+  const N = 30;
+  let best = Infinity;
+  for (let i = 0; i <= N; i++) {
+    const pt = bezierPoint(a, cp, b, i / N);
+    const d = dist(p, pt);
+    if (d < best) best = d;
+  }
+  return best;
+}
+
+/**
+ * Approximate arc-length t for nearest point on a quadratic Bézier curve.
+ * Returns t ∈ [0,1] for the closest sample out of N.
+ */
+export function nearestTOnCurve(p: Vec2, a: Vec2, cp: Vec2, b: Vec2): number {
+  const N = 60;
+  let bestT = 0;
+  let bestD = Infinity;
+  for (let i = 0; i <= N; i++) {
+    const t = i / N;
+    const pt = bezierPoint(a, cp, b, t);
+    const d = dist(p, pt);
+    if (d < bestD) {
+      bestD = d;
+      bestT = t;
+    }
+  }
+  return bestT;
+}
+
 export function totalLanes(seg: RoadSegment) {
   return seg.lanesForward + seg.lanesBackward;
 }
@@ -77,11 +129,13 @@ export function nodeHalfSize(
  * The node box will be rotated by this angle to align with the road direction.
  * Uses only the dominant segment's direction (by lane count) so nodes with two
  * inputs (e.g. middle of a straight road) orient correctly, not averaged.
+ * When the dominant segment is curved, uses the Bézier tangent at the endpoint.
  */
 export function nodeOrientationAngle(
   nodeId: string,
   segs: RoadSegment[],
   nodeMap: Map<string, Vec2>,
+  cpMap?: Map<string, Vec2>,
 ): number {
   const conn = nodeSegments(segs, nodeId);
   if (conn.length === 0) return 0;
@@ -90,11 +144,32 @@ export function nodeOrientationAngle(
     totalLanes(a) >= totalLanes(b) ? a : b,
   );
 
+  const node = nodeMap.get(nodeId);
+  if (!node) return 0;
+
+  const cp = cpMap?.get(dominant.id);
+  if (cp) {
+    const fromId = dominant.fromId;
+    const toId = dominant.toId;
+    const fromNode = nodeMap.get(fromId);
+    const toNode = nodeMap.get(toId);
+    if (fromNode && toNode) {
+      // t=0 is fromId, t=1 is toId — tangent points from from→to
+      const tAtNode = nodeId === fromId ? 0 : 1;
+      const tan = bezierTangent(fromNode, cp, toNode, tAtNode);
+      const len = Math.hypot(tan.x, tan.y);
+      if (len > 1e-6) {
+        // angle pointing away from the other node (same convention as chord)
+        const sign = nodeId === fromId ? -1 : 1;
+        return Math.atan2(sign * tan.y, sign * tan.x);
+      }
+    }
+  }
+
   const otherId =
     dominant.fromId === nodeId ? dominant.toId : dominant.fromId;
   const other = nodeMap.get(otherId);
-  const node = nodeMap.get(nodeId);
-  if (!other || !node) return 0;
+  if (!other) return 0;
 
   const dx = node.x - other.x,
     dy = node.y - other.y;
@@ -159,6 +234,7 @@ export function nearestSegment(
   p: Vec2,
   fallback: number,
   scale: number,
+  cpMap?: Map<string, Vec2>,
 ): RoadSegment | null {
   let best: RoadSegment | null = null,
     bestD = Infinity;
@@ -166,7 +242,8 @@ export function nearestSegment(
     const a = nodeMap.get(s.fromId),
       b = nodeMap.get(s.toId);
     if (!a || !b) continue;
-    const d = distToSegment(p, a, b);
+    const cp = cpMap?.get(s.id);
+    const d = cp ? distToCurve(p, a, cp, b) : distToSegment(p, a, b);
     if (d < Math.max(roadWidth(s, scale) / 2, fallback * scale) && d < bestD) {
       bestD = d;
       best = s;
@@ -181,6 +258,7 @@ export function nearestCrossing(
   segs: RoadSegment[],
   p: Vec2,
   scale: number,
+  cpMap?: Map<string, Vec2>,
 ): { seg: RoadSegment; crossing: PedestrianCrossing } | null {
   let best: { seg: RoadSegment; crossing: PedestrianCrossing } | null = null;
   let bestD = Infinity;
@@ -192,11 +270,13 @@ export function nearestCrossing(
     if (!a || !b) continue;
     const rw = roadWidth(s, scale);
     const hitRadius = rw * 0.7;
+    const cp = cpMap?.get(s.id);
 
     for (const cross of crossings) {
-      const cx = a.x + cross.t * (b.x - a.x);
-      const cy = a.y + cross.t * (b.y - a.y);
-      const d = dist(p, { x: cx, y: cy });
+      const pt = cp
+        ? bezierPoint(a, cp, b, cross.t)
+        : { x: a.x + cross.t * (b.x - a.x), y: a.y + cross.t * (b.y - a.y) };
+      const d = dist(p, pt);
       if (d < hitRadius && d < bestD) {
         bestD = d;
         best = { seg: s, crossing: cross };
@@ -206,13 +286,14 @@ export function nearestCrossing(
   return best;
 }
 
-/** Find nearest segment and return projection parameter t (0..1). */
+/** Find nearest segment and return projection parameter t (0..1). Curve-aware when cpMap is supplied. */
 export function nearestSegmentWithT(
   nodeMap: Map<string, ScreenNode>,
   segs: RoadSegment[],
   p: Vec2,
   fallback: number,
   scale: number,
+  cpMap?: Map<string, Vec2>,
 ): { seg: RoadSegment; t: number } | null {
   let best: { seg: RoadSegment; t: number } | null = null,
     bestD = Infinity;
@@ -220,7 +301,17 @@ export function nearestSegmentWithT(
     const a = nodeMap.get(s.fromId),
       b = nodeMap.get(s.toId);
     if (!a || !b) continue;
-    const { t, dist: d } = projectToSegment(p, a, b);
+    const cp = cpMap?.get(s.id);
+    let t: number;
+    let d: number;
+    if (cp) {
+      t = nearestTOnCurve(p, a, cp, b);
+      d = dist(p, bezierPoint(a, cp, b, t));
+    } else {
+      const proj = projectToSegment(p, a, b);
+      t = proj.t;
+      d = proj.dist;
+    }
     if (d < Math.max(roadWidth(s, scale) / 2, fallback * scale) && d < bestD) {
       bestD = d;
       best = { seg: s, t };
@@ -249,6 +340,7 @@ export function nearestBusStop(
   segs: RoadSegment[],
   p: Vec2,
   scale: number,
+  cpMap?: Map<string, Vec2>,
 ): { seg: RoadSegment; busStop: BusStop } | null {
   let best: { seg: RoadSegment; busStop: BusStop } | null = null;
   let bestD = Infinity;
@@ -259,14 +351,56 @@ export function nearestBusStop(
     if (!a || !b) continue;
     const rw = roadWidth(s, scale);
     const hitRadius = rw * 0.9;
+    const cp = cpMap?.get(s.id);
     for (const stop of stops) {
-      const cx = a.x + stop.t * (b.x - a.x);
-      const cy = a.y + stop.t * (b.y - a.y);
-      const d = dist(p, { x: cx, y: cy });
+      const pt = cp
+        ? bezierPoint(a, cp, b, stop.t)
+        : { x: a.x + stop.t * (b.x - a.x), y: a.y + stop.t * (b.y - a.y) };
+      const d = dist(p, pt);
       if (d < hitRadius && d < bestD) {
         bestD = d;
         best = { seg: s, busStop: stop };
       }
+    }
+  }
+  return best;
+}
+
+/** Hit radius for speed limit icon (matches canvas icon size). */
+const SPEED_LIMIT_ICON_HIT_RADIUS_SCALE = 14;
+
+/** Find if click is on the speed limit icon of a segment. */
+export function nearestSpeedLimitMarker(
+  nodeMap: Map<string, ScreenNode>,
+  segs: RoadSegment[],
+  p: Vec2,
+  scale: number,
+  cpMap?: Map<string, Vec2>,
+): RoadSegment | null {
+  let best: RoadSegment | null = null;
+  let bestD = Infinity;
+  for (const s of segs) {
+    const a = nodeMap.get(s.fromId),
+      b = nodeMap.get(s.toId);
+    if (!a || !b) continue;
+    const segLen = dist(a, b);
+    if (segLen < 2) continue;
+    const cp = cpMap?.get(s.id);
+    const hsA = nodeHalfSize(s.fromId, segs, scale);
+    const hsB = nodeHalfSize(s.toId, segs, scale);
+    const margin = 4 * scale;
+    const tA = (hsA + margin) / segLen;
+    const tB = 1 - (hsB + margin) / segLen;
+    if (tA >= tB) continue;
+    const tMid = (tA + tB) / 2;
+    const midPt = cp
+      ? bezierPoint(a, cp, b, tMid)
+      : { x: a.x + tMid * (b.x - a.x), y: a.y + tMid * (b.y - a.y) };
+    const hitRadius = SPEED_LIMIT_ICON_HIT_RADIUS_SCALE * scale;
+    const d = dist(p, midPt);
+    if (d < hitRadius && d < bestD) {
+      bestD = d;
+      best = s;
     }
   }
   return best;
@@ -278,6 +412,7 @@ export function nearestParkingSpace(
   segs: RoadSegment[],
   p: Vec2,
   scale: number,
+  cpMap?: Map<string, Vec2>,
 ): { seg: RoadSegment; parkingSpace: ParkingSpace } | null {
   let best: { seg: RoadSegment; parkingSpace: ParkingSpace } | null = null;
   let bestD = Infinity;
@@ -288,10 +423,12 @@ export function nearestParkingSpace(
     if (!a || !b) continue;
     const rw = roadWidth(s, scale);
     const hitRadius = rw * 0.9;
+    const cp = cpMap?.get(s.id);
     for (const space of spaces) {
-      const cx = a.x + space.t * (b.x - a.x);
-      const cy = a.y + space.t * (b.y - a.y);
-      const d = dist(p, { x: cx, y: cy });
+      const pt = cp
+        ? bezierPoint(a, cp, b, space.t)
+        : { x: a.x + space.t * (b.x - a.x), y: a.y + space.t * (b.y - a.y) };
+      const d = dist(p, pt);
       if (d < hitRadius && d < bestD) {
         bestD = d;
         best = { seg: s, parkingSpace: space };

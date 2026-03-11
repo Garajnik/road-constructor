@@ -81,9 +81,9 @@ export function Toolbar({
             setTool("road");
             setBuildFrom(null);
           }}
-          title="Road (R)"
+          title="Дорога (R)"
         >
-          ✏ Road
+          ✏ Дорога
         </button>
         <button
           style={toolBtn("select")}
@@ -91,9 +91,9 @@ export function Toolbar({
             setTool("select");
             setBuildFrom(null);
           }}
-          title="Select (S)"
+          title="Выбрать (S)"
         >
-          ⬚ Select
+          ⬚ Выбрать
         </button>
         <button
           style={toolBtn("delete")}
@@ -101,21 +101,21 @@ export function Toolbar({
             setTool("delete");
             setBuildFrom(null);
           }}
-          title="Delete (D)"
+          title="Удалить (D)"
         >
-          ✂ Delete
+          ✂ Удалить
         </button>
       </div>
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
 
       <span style={{ color: "#fff", fontSize: 11, whiteSpace: "nowrap" }}>
-        New road:
+        Новая дорога:
       </span>
       <button
         onClick={() => setDefLanesB(defOneWay ? 1 : 0)}
         style={chip(!defOneWay)}
       >
-        {defOneWay ? "→ One-way" : "↔ Two-way"}
+        {defOneWay ? "→ Односторонняя" : "↔ Двусторонняя"}
       </button>
       <span style={{ color: "#fff", fontSize: 11 }}>→</span>
       {[1, 2, 3, 4].map((n) => (
@@ -151,7 +151,7 @@ export function Toolbar({
       )}
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#fff", fontSize: 11 }}>Speed:</span>
+      <span style={{ color: "#fff", fontSize: 11 }}>Скорость:</span>
       {[30, 50, 70, 90, 110].map((s) => (
         <button
           key={s}
@@ -163,7 +163,7 @@ export function Toolbar({
       ))}
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
-      <span style={{ color: "#fff", fontSize: 11 }}>Surface:</span>
+      <span style={{ color: "#fff", fontSize: 11 }}>Покрытие:</span>
       {SURFACE_KEYS.map((k) => (
         <button
           key={k}
@@ -187,7 +187,7 @@ export function Toolbar({
 
       <div style={{ width: 1, height: 24, background: "#1e1e3e" }} />
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ color: "#fff", fontSize: 11 }}>Road size:</span>
+        <span style={{ color: "#fff", fontSize: 11 }}>Размер дорог:</span>
         <input
           type="range"
           min={0.05}
@@ -196,14 +196,14 @@ export function Toolbar({
           value={roadScale}
           onChange={(e) => setRoadScale(parseFloat(e.target.value))}
           style={{ width: 80, accentColor: "#4a80c0" }}
-          title={`Display scale: ${roadScale.toFixed(2)}x`}
+          title={`Масштаб отображения: ${roadScale.toFixed(2)}x`}
         />
         <span style={{ color: "#fff", fontSize: 11, minWidth: 32 }}>
           {roadScale.toFixed(2)}×
         </span>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: "#fff", fontSize: 11 }}>New:</span>
+        <span style={{ color: "#fff", fontSize: 11 }}>Новая:</span>
         <input
           type="range"
           min={0.05}
@@ -212,7 +212,7 @@ export function Toolbar({
           value={defDisplayScale}
           onChange={(e) => setDefDisplayScale(parseFloat(e.target.value))}
           style={{ width: 60, accentColor: "#4a80c0" }}
-          title={`Default size for new segments: ${defDisplayScale.toFixed(2)}×`}
+          title={`Размер для новых участков: ${defDisplayScale.toFixed(2)}×`}
         />
         <span style={{ color: "#fff", fontSize: 10 }}>
           {defDisplayScale.toFixed(2)}×
@@ -232,7 +232,7 @@ export function Toolbar({
           fontSize: 13,
         }}
       >
-        Clear
+        Очистить
       </button>
 
       <div
@@ -246,17 +246,21 @@ export function Toolbar({
         }}
       >
         <span>
-          {nodeCount} nodes · {segmentCount} roads
+          {nodeCount} узлов · {segmentCount} дорог
         </span>
         {intersectionCount > 0 && (
           <span style={{ color: "#ffa000" }}>
-            ✕ {intersectionCount} intersection
-            {intersectionCount > 1 ? "s" : ""}
+            ✕ {intersectionCount}{" "}
+            {intersectionCount === 1
+              ? "пересечение"
+              : intersectionCount < 5
+                ? "пересечения"
+                : "пересечений"}
           </span>
         )}
         {buildFrom && (
           <span style={{ color: "#5aafff" }}>
-            Building — right-click or Esc to stop
+            Построение — ПКМ или Esc для отмены
           </span>
         )}
       </div>

@@ -34,17 +34,17 @@ export const COEFF: Record<
   }
 > = {
   speed_limit: {
-    label: "Speed Limit",
+    label: "Ограничение скорости",
     symbol: "S",
     color: "#e05050",
-    unit: "km/h",
+    unit: "км/ч",
     min: 5,
     max: 200,
     step: 5,
     default: 60,
   },
   road_condition: {
-    label: "Road Condition",
+    label: "Состояние дороги",
     symbol: "C",
     color: "#e09030",
     unit: "%",
@@ -54,7 +54,7 @@ export const COEFF: Record<
     default: 80,
   },
   road_slope: {
-    label: "Road Slope",
+    label: "Уклон дороги",
     symbol: "/",
     color: "#8a6a40",
     unit: "°",
@@ -64,17 +64,17 @@ export const COEFF: Record<
     default: 0,
   },
   turning_radius: {
-    label: "Turning Radius",
+    label: "Радиус поворота",
     symbol: "R",
     color: "#5080c0",
-    unit: "m",
+    unit: "м",
     min: 5,
     max: 500,
     step: 5,
     default: 50,
   },
   pedestrian_crossing: {
-    label: "Ped. Crossing",
+    label: "Пешеходный переход",
     symbol: "X",
     color: "#e0c030",
     unit: "",
@@ -84,17 +84,17 @@ export const COEFF: Record<
     default: 1,
   },
   parking: {
-    label: "Parking",
+    label: "Парковка",
     symbol: "P",
     color: "#40a0c0",
-    unit: "spots",
+    unit: "мест",
     min: 0,
     max: 100,
     step: 1,
     default: 10,
   },
   bus_stop: {
-    label: "Bus Stop",
+    label: "Остановка",
     symbol: "B",
     color: "#40a060",
     unit: "",
@@ -104,7 +104,7 @@ export const COEFF: Record<
     default: 1,
   },
   maneuver: {
-    label: "Maneuver",
+    label: "Манёвр",
     symbol: "M",
     color: "#9060c0",
     unit: "",
@@ -114,10 +114,10 @@ export const COEFF: Record<
     default: 0.5,
   },
   lane_width: {
-    label: "Lane Width",
+    label: "Ширина полосы",
     symbol: "W",
     color: "#40a0a0",
-    unit: "m",
+    unit: "м",
     min: 2,
     max: 5,
     step: 0.1,
@@ -132,22 +132,22 @@ export const SURFACE: Record<
   asphalt: {
     color: "#454545",
     border: "#1e1e1e",
-    label: "Asphalt",
+    label: "Асфальт",
     dot: "#666",
   },
   concrete: {
     color: "#686868",
     border: "#3a3a3a",
-    label: "Concrete",
+    label: "Бетон",
     dot: "#999",
   },
   gravel: {
     color: "#6a5a40",
     border: "#3a2e1e",
-    label: "Gravel",
+    label: "Гравий",
     dot: "#8a7a50",
   },
-  dirt: { color: "#8a6a40", border: "#5a3e1e", label: "Dirt", dot: "#b09060" },
+  dirt: { color: "#8a6a40", border: "#5a3e1e", label: "Грунт", dot: "#b09060" },
 };
 
 export const SURFACE_KEYS: SurfaceType[] = [

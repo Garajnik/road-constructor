@@ -47,19 +47,19 @@ export function SelectionInfoPanel({
             }}
           >
             {isIntersection
-              ? "✕ Intersection"
+              ? "✕ Перекрёсток"
               : selNodeSegs.length === 0
-                ? "○ Isolated"
+                ? "○ Изолированный"
                 : selNodeSegs.length === 1
-                  ? "● Road End"
-                  : "↩ Waypoint"}
+                  ? "● Конец дороги"
+                  : "↩ Промежуточный узел"}
           </div>
           <div style={{ color: "#556" }}>
-            Connections:{" "}
+            Соединений:{" "}
             <span style={{ color: "#99a" }}>{selNodeSegs.length}</span>
           </div>
           <div style={{ color: "#556", marginBottom: 10 }}>
-            At:{" "}
+            Координаты:{" "}
             <span style={{ color: "#778" }}>
               {selNode.lat.toFixed(5)}, {selNode.lng.toFixed(5)}
             </span>
@@ -75,7 +75,7 @@ export function SelectionInfoPanel({
               borderColor: "#2a4a80",
             }}
           >
-            + Add connection
+            + Добавить соединение
           </button>
         </>
       )}
@@ -89,12 +89,12 @@ export function SelectionInfoPanel({
               fontSize: 14,
             }}
           >
-            Road Segment
+            Участок дороги
           </div>
           <div style={{ color: "#778", marginBottom: 3 }}>
             {selSeg.lanesBackward > 0
-              ? `${selSeg.lanesForward} ↔ ${selSeg.lanesBackward} lanes`
-              : `${selSeg.lanesForward} lane${selSeg.lanesForward > 1 ? "s" : ""} → one-way`}
+              ? `${selSeg.lanesForward} ↔ ${selSeg.lanesBackward} полос`
+              : `${selSeg.lanesForward} полос → одностороннее`}
           </div>
           <div style={{ color: "#778", marginBottom: 3 }}>
             {selSeg.speedLimit} km/h
@@ -103,7 +103,7 @@ export function SelectionInfoPanel({
             {SURFACE[selSeg.surface].label}
           </div>
           <div style={{ color: "#778" }}>
-            Size: {(selSeg.displayScale ?? 1).toFixed(2)}×
+            Размер: {(selSeg.displayScale ?? 1).toFixed(2)}×
           </div>
           {selSeg.coefficients && selSeg.coefficients.length > 0 && (
             <div
@@ -116,7 +116,7 @@ export function SelectionInfoPanel({
               <div
                 style={{ color: "#556", fontSize: 11, marginBottom: 4 }}
               >
-                Coefficients:
+                Коэффициенты:
               </div>
               {selSeg.coefficients.map((c) => {
                 const cfg = COEFF[c.type];
@@ -153,7 +153,7 @@ export function SelectionInfoPanel({
             </div>
           )}
           <div style={{ color: "#445", fontSize: 11, marginTop: 8 }}>
-            Right-click to edit
+            ПКМ для редактирования
           </div>
         </>
       )}
@@ -166,7 +166,7 @@ export function SelectionInfoPanel({
           borderTop: "1px solid #1e1e3a",
         }}
       >
-        Del / Backspace to remove
+        Del / Backspace для удаления
       </div>
     </div>
   );

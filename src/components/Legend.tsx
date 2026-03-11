@@ -15,14 +15,14 @@ export function Legend() {
         padding: "4px 10px",
       }}
     >
-      <div>R = Road · S = Select · D = Delete · Esc = Cancel</div>
-      <div>Ctrl+Z = Undo · Ctrl+Y = Redo</div>
-      <div>Scroll = Zoom · +/- = Zoom in/out · Shift+drag / Middle-drag = Pan</div>
+      <div>R = Дорога · S = Выбрать · D = Удалить · Esc = Отмена</div>
+      <div>Ctrl+Z = Отмена · Ctrl+Y = Повтор</div>
+      <div>Scroll = Масштаб · +/- = Увеличить/уменьшить · Shift+перетаскивание / Средняя кнопка = Перемещение</div>
       <div>
-        Road size = global slider · Right-click road for per-segment size
+        Размер дороги = глобальный ползунок · ПКМ по дороге для размера участка
       </div>
       <div>
-        Right-click a road to edit · Hover a node to add connections
+        ПКМ по дороге для редактирования · Наведите на узел для добавления соединений
       </div>
     </div>
   );

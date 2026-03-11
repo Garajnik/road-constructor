@@ -65,7 +65,7 @@ export function ObstaclePalette({
         }}
       >
         <span style={{ fontWeight: 700, color: "#eef", fontSize: 13 }}>
-          Obstacles
+          Объекты
         </span>
         <span style={{ color: "#556", fontSize: 11 }}>
           {paletteOpen ? "▲" : "▼"}
@@ -129,7 +129,7 @@ export function ObstaclePalette({
             <span
               style={{ color: "#e0c030", fontSize: 12, fontWeight: 600 }}
             >
-              Crosswalk
+              Пешеходный переход
             </span>
           </div>
           <div
@@ -181,7 +181,7 @@ export function ObstaclePalette({
               B
             </div>
             <span style={{ color: "#40a060", fontSize: 12, fontWeight: 600 }}>
-              Bus Stop
+              Остановка
             </span>
           </div>
           <div
@@ -233,7 +233,7 @@ export function ObstaclePalette({
               P
             </div>
             <span style={{ color: "#40a0c0", fontSize: 12, fontWeight: 600 }}>
-              Parking
+              Парковка
             </span>
           </div>
           {COEFF_TYPES.filter(
@@ -318,7 +318,7 @@ export function ObstaclePalette({
               borderTop: "1px solid #1a1a30",
             }}
           >
-            Drag onto a road segment
+            Перетащите на участок дороги
           </div>
         </div>
       )}

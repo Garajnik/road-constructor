@@ -107,7 +107,7 @@ export function RoadEditPanel({
         }}
       >
         <span style={{ fontWeight: 700, color: "#eef", fontSize: 14 }}>
-          Road Properties
+          Свойства дороги
         </span>
         <button
           onClick={onClose}
@@ -144,12 +144,12 @@ export function RoadEditPanel({
               fontWeight: 600,
             }}
           >
-            ⊕ Add node here ({(segmentT * 100).toFixed(0)}%)
+            ⊕ Добавить узел ({(segmentT * 100).toFixed(0)}%)
           </button>
         </div>
       )}
 
-      <CollapsibleSection label="Speed Limit (km/h)">
+      <CollapsibleSection label="Ограничение скорости (км/ч)">
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {SPEED_PRESETS.map((s) => (
             <button
@@ -163,7 +163,7 @@ export function RoadEditPanel({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection label="Surface Type">
+      <CollapsibleSection label="Тип покрытия">
         <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {SURFACE_KEYS.map((k) => (
             <button
@@ -188,13 +188,13 @@ export function RoadEditPanel({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection label="Traffic Flow">
+      <CollapsibleSection label="Направление движения">
         <div style={{ display: "flex", gap: 6 }}>
           <button
             onClick={() => onChange({ ...seg, lanesBackward: 0 })}
             style={chip(oneWay)}
           >
-            → One-way
+            → Одностороннее
           </button>
           <button
             onClick={() =>
@@ -205,27 +205,27 @@ export function RoadEditPanel({
             }
             style={chip(!oneWay)}
           >
-            ↔ Two-way
+            ↔ Двустороннее
           </button>
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection label="Lanes">
+      <CollapsibleSection label="Полосы">
         <LaneCounter
-          label={oneWay ? "Number of Lanes" : "Lanes → (forward)"}
+          label={oneWay ? "Количество полос" : "Полосы → (вперёд)"}
           value={seg.lanesForward}
           onChange={(v) => onChange({ ...seg, lanesForward: v })}
         />
         {!oneWay && (
           <LaneCounter
-            label="Lanes ← (backward)"
+            label="Полосы ← (назад)"
             value={seg.lanesBackward}
             onChange={(v) => onChange({ ...seg, lanesBackward: v })}
           />
         )}
       </CollapsibleSection>
 
-      <CollapsibleSection label="Segment Size">
+      <CollapsibleSection label="Размер участка">
         <div
           style={{
             display: "flex",
@@ -250,7 +250,7 @@ export function RoadEditPanel({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection label="Coefficients">
+      <CollapsibleSection label="Коэффициенты">
         <div>
           {(seg.pedestrianCrossings ?? []).map((c) => (
             <div
@@ -266,7 +266,7 @@ export function RoadEditPanel({
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <span style={{ color: "#e0c030", fontSize: 12 }}>⇔</span>
                 <span style={{ color: "#99a", fontSize: 11 }}>
-                  {(c.t * 100).toFixed(0)}% along road
+                  {(c.t * 100).toFixed(0)}% вдоль дороги
                 </span>
                 <button
                   onClick={() =>
@@ -299,7 +299,7 @@ export function RoadEditPanel({
                   marginTop: 4,
                 }}
               >
-                <span style={{ color: "#667", fontSize: 10 }}>Width:</span>
+                <span style={{ color: "#667", fontSize: 10 }}>Ширина:</span>
                 <input
                   type="range"
                   min={CROSSING_MIN_WIDTH}
@@ -345,7 +345,7 @@ export function RoadEditPanel({
               marginTop: 4,
             }}
           >
-            + Add crossing at center
+            + Добавить переход в центре
           </button>
           <div
             style={{
@@ -394,8 +394,8 @@ export function RoadEditPanel({
                   fontSize: 11,
                 }}
               >
-                <option value="left">Left</option>
-                <option value="right">Right</option>
+                <option value="left">Слева</option>
+                <option value="right">Справа</option>
               </select>
               <button
                 onClick={() =>
@@ -443,7 +443,7 @@ export function RoadEditPanel({
               marginTop: 4,
             }}
           >
-            + Add bus stop at center
+            + Добавить остановку в центре
           </button>
           <div
             style={{
@@ -492,14 +492,14 @@ export function RoadEditPanel({
                     fontSize: 11,
                   }}
                 >
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                </select>
-                <button
-                  onClick={() =>
-                    onChange({
-                      ...seg,
-                      parkingSpaces: (seg.parkingSpaces ?? []).filter(
+                <option value="left">Слева</option>
+                <option value="right">Справа</option>
+              </select>
+              <button
+                onClick={() =>
+                  onChange({
+                    ...seg,
+                    parkingSpaces: (seg.parkingSpaces ?? []).filter(
                         (p) => p.id !== ps.id,
                       ),
                     })
@@ -526,7 +526,7 @@ export function RoadEditPanel({
                   marginTop: 4,
                 }}
               >
-                <span style={{ color: "#667", fontSize: 10 }}>Length:</span>
+                <span style={{ color: "#667", fontSize: 10 }}>Длина:</span>
                 <input
                   type="range"
                   min={PARKING_MIN_LENGTH_T}
@@ -577,7 +577,7 @@ export function RoadEditPanel({
               marginTop: 4,
             }}
           >
-            + Add parking at center
+            + Добавить парковку в центре
           </button>
           <div
             style={{
@@ -714,7 +714,7 @@ export function RoadEditPanel({
                 marginTop: 4,
               }}
             >
-              <option value="">+ Add coefficient...</option>
+              <option value="">+ Добавить коэффициент...</option>
               {COEFF_TYPES.filter(
                 (t) => !(seg.coefficients ?? []).some((c) => c.type === t),
               ).map((t) => (
@@ -727,7 +727,7 @@ export function RoadEditPanel({
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection label="Service Level from Congestion">
+      <CollapsibleSection label="Уровень обслуживания от загрузки">
         <div
           style={{
             padding: "10px 12px",
@@ -738,7 +738,7 @@ export function RoadEditPanel({
         >
           <div style={{ marginBottom: 8 }}>
             <span style={{ color: "#99a", fontSize: 11 }}>
-              Traffic intensity N (cars/h)
+              Интенсивность трафика N (авт/ч)
             </span>
             <input
               type="number"
@@ -770,10 +770,10 @@ export function RoadEditPanel({
             />
           </div>
           <div style={{ color: "#99a", fontSize: 11, marginBottom: 2 }}>
-            Capacity P = {computeCapacity(seg).toLocaleString()} cars/h
+            Пропускная способность P = {computeCapacity(seg).toLocaleString()} авт/ч
           </div>
           <div style={{ fontSize: 11, color: "#778", marginBottom: 6 }}>
-            (affected by lanes, speed, surface, obstacles, crossings)
+            (зависит от полос, скорости, покрытия, препятствий, переходов)
           </div>
           {seg.trafficIntensity != null &&
             seg.trafficIntensity >= 0 &&

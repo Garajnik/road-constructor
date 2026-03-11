@@ -285,7 +285,7 @@ export default function App() {
               alignItems: "center",
               justifyContent: "center",
             }}
-            title="Zoom in (+)"
+            title="Приблизить (+)"
           >
             +
           </button>
@@ -304,7 +304,7 @@ export default function App() {
               fontSize: 10,
               fontFamily: "monospace",
             }}
-            title={`Zoom: ${zoomLevel.toFixed(1)}`}
+            title={`Масштаб: ${zoomLevel.toFixed(1)}`}
           >
             {zoomLevel.toFixed(1)}
           </div>
@@ -325,7 +325,7 @@ export default function App() {
               alignItems: "center",
               justifyContent: "center",
             }}
-            title="Zoom out (-)"
+            title="Отдалить (-)"
           >
             -
           </button>
